@@ -1,0 +1,161 @@
+{
+  "appgroup_id": "6974c00fc46e44fd169b3404",
+  "appgroup_name": "Bestellabgleich-System",
+  "apps": {
+    "bestellung": {
+      "app_id": "6974bfff33b1830867bd937b",
+      "name": "Bestellung",
+      "controls": {
+        "bestellung_pdf": {
+          "identifier": "bestellung_pdf",
+          "label": "Bestell-PDF",
+          "type": "file",
+          "subtype": null,
+          "fulltype": "file",
+          "description": "An uploaded file. (Or `null`/`None`)\n\nThe field value will be a URL to download the file in the form `https://<hostname>/files/<app-id>/data/<record-id>/<control-identifier>/<internal-id>` or `null`."
+        },
+        "bestellung_ocr_status": {
+          "identifier": "bestellung_ocr_status",
+          "label": "OCR erfolgreich?",
+          "type": "bool",
+          "subtype": null,
+          "fulltype": "bool",
+          "description": "A boolean value, i.e. `true` or `false` (or `null`)."
+        },
+        "bestellung_nummer": {
+          "identifier": "bestellung_nummer",
+          "label": "Bestellnummer (automatisch erkannt)",
+          "type": "string",
+          "subtype": "text",
+          "fulltype": "string/text",
+          "description": "A string value not longer than 4000 characters (or `null`)."
+        },
+        "bestellung_lieferant": {
+          "identifier": "bestellung_lieferant",
+          "label": "Lieferant (automatisch erkannt)",
+          "type": "string",
+          "subtype": "text",
+          "fulltype": "string/text",
+          "description": "A string value not longer than 4000 characters (or `null`)."
+        },
+        "bestellung_datum": {
+          "identifier": "bestellung_datum",
+          "label": "Bestelldatum (automatisch erkannt)",
+          "type": "date",
+          "subtype": "date",
+          "fulltype": "date/date",
+          "description": "A calendar date consisting of year, month and day. (Or `null`/`None`)\n\nThe field value will be a string in the format `<YYYY>-<MM>-<DD>` or `null`.\n\nFor example: `1642-12-25`."
+        },
+        "bestellung_positionen": {
+          "identifier": "bestellung_positionen",
+          "label": "Bestellpositionen (automatisch erkannt)",
+          "type": "string",
+          "subtype": "textarea",
+          "fulltype": "string/textarea",
+          "description": "A string value that can contain multiple lines of text (or `null`)."
+        }
+      }
+    },
+    "auftragsbestaetigung": {
+      "app_id": "6974c0030c018953722d51d8",
+      "name": "Auftragsbest\u00e4tigung",
+      "controls": {
+        "ab_pdf": {
+          "identifier": "ab_pdf",
+          "label": "Auftragsbest\u00e4tigung-PDF",
+          "type": "file",
+          "subtype": null,
+          "fulltype": "file",
+          "description": "An uploaded file. (Or `null`/`None`)\n\nThe field value will be a URL to download the file in the form `https://<hostname>/files/<app-id>/data/<record-id>/<control-identifier>/<internal-id>` or `null`."
+        },
+        "ab_ocr_status": {
+          "identifier": "ab_ocr_status",
+          "label": "OCR erfolgreich?",
+          "type": "bool",
+          "subtype": null,
+          "fulltype": "bool",
+          "description": "A boolean value, i.e. `true` or `false` (or `null`)."
+        },
+        "ab_nummer": {
+          "identifier": "ab_nummer",
+          "label": "Best\u00e4tigungsnummer (automatisch erkannt)",
+          "type": "string",
+          "subtype": "text",
+          "fulltype": "string/text",
+          "description": "A string value not longer than 4000 characters (or `null`)."
+        },
+        "ab_lieferant": {
+          "identifier": "ab_lieferant",
+          "label": "Lieferant (automatisch erkannt)",
+          "type": "string",
+          "subtype": "text",
+          "fulltype": "string/text",
+          "description": "A string value not longer than 4000 characters (or `null`)."
+        },
+        "ab_datum": {
+          "identifier": "ab_datum",
+          "label": "Best\u00e4tigungsdatum (automatisch erkannt)",
+          "type": "date",
+          "subtype": "date",
+          "fulltype": "date/date",
+          "description": "A calendar date consisting of year, month and day. (Or `null`/`None`)\n\nThe field value will be a string in the format `<YYYY>-<MM>-<DD>` or `null`.\n\nFor example: `1642-12-25`."
+        },
+        "ab_positionen": {
+          "identifier": "ab_positionen",
+          "label": "Positionen (automatisch erkannt)",
+          "type": "string",
+          "subtype": "textarea",
+          "fulltype": "string/textarea",
+          "description": "A string value that can contain multiple lines of text (or `null`)."
+        }
+      }
+    },
+    "automatischer_abgleich": {
+      "app_id": "6974c003a5ae425a8e64d3b3",
+      "name": "Automatischer Abgleich",
+      "controls": {
+        "abgleich_bestellung": {
+          "identifier": "abgleich_bestellung",
+          "label": "Bestellung ausw\u00e4hlen",
+          "type": "applookup",
+          "subtype": "select",
+          "fulltype": "applookup/select",
+          "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
+          "lookup_app": "https://my.living-apps.de/rest/apps/6974bfff33b1830867bd937b"
+        },
+        "abgleich_ab": {
+          "identifier": "abgleich_ab",
+          "label": "Auftragsbest\u00e4tigung ausw\u00e4hlen",
+          "type": "applookup",
+          "subtype": "select",
+          "fulltype": "applookup/select",
+          "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
+          "lookup_app": "https://my.living-apps.de/rest/apps/6974c0030c018953722d51d8"
+        },
+        "abgleich_status": {
+          "identifier": "abgleich_status",
+          "label": "Alle Daten stimmen \u00fcberein?",
+          "type": "bool",
+          "subtype": null,
+          "fulltype": "bool",
+          "description": "A boolean value, i.e. `true` or `false` (or `null`)."
+        },
+        "abgleich_abweichungen": {
+          "identifier": "abgleich_abweichungen",
+          "label": "Abweichungen (tabellarisch angezeigt)",
+          "type": "string",
+          "subtype": "textarea",
+          "fulltype": "string/textarea",
+          "description": "A string value that can contain multiple lines of text (or `null`)."
+        }
+      }
+    }
+  },
+  "metadata": {
+    "apps_list": [
+      "Bestellung",
+      "Auftragsbest\u00e4tigung",
+      "Automatischer Abgleich"
+    ]
+  }
+}
