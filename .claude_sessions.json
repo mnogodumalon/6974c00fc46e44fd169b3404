@@ -1,0 +1,11 @@
+{
+  "sessions": [
+    {
+      "id": "66c99224-20a8-4e75-b119-5e80332dbdec",
+      "name": "2026-01-24 12:57 - Initial build: Bestellabgleich...",
+      "created_at": "2026-01-24T12:57:52.105803Z",
+      "last_used": "2026-01-24T12:57:52.105803Z"
+    }
+  ],
+  "active_session": "66c99224-20a8-4e75-b119-5e80332dbdec"
+}
