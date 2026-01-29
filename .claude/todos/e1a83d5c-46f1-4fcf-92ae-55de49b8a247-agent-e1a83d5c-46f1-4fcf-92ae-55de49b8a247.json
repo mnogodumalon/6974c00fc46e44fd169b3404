@@ -1,0 +1,17 @@
+[
+  {
+    "content": "Create design_brief.md for Bestellabgleich-System dashboard",
+    "status": "completed",
+    "activeForm": "Creating design brief for order comparison system"
+  },
+  {
+    "content": "Implement Dashboard.tsx following design brief exactly",
+    "status": "completed",
+    "activeForm": "Implementing Dashboard component"
+  },
+  {
+    "content": "Build and deploy using deploy_to_github tool",
+    "status": "in_progress",
+    "activeForm": "Building and deploying to GitHub"
+  }
+]

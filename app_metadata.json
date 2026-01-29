@@ -2,79 +2,39 @@
   "appgroup_id": "6974c00fc46e44fd169b3404",
   "appgroup_name": "Bestellabgleich-System",
   "apps": {
-    "bestellung": {
-      "app_id": "6974bfff33b1830867bd937b",
-      "name": "Bestellung",
-      "controls": {
-        "bestellung_pdf": {
-          "identifier": "bestellung_pdf",
-          "label": "Bestell-PDF",
-          "type": "file",
-          "subtype": null,
-          "fulltype": "file",
-          "description": "An uploaded file. (Or `null`/`None`)\n\nThe field value will be a URL to download the file in the form `https://<hostname>/files/<app-id>/data/<record-id>/<control-identifier>/<internal-id>` or `null`."
-        },
-        "bestellung_ocr_status": {
-          "identifier": "bestellung_ocr_status",
-          "label": "OCR erfolgreich?",
-          "type": "bool",
-          "subtype": null,
-          "fulltype": "bool",
-          "description": "A boolean value, i.e. `true` or `false` (or `null`)."
-        },
-        "bestellung_nummer": {
-          "identifier": "bestellung_nummer",
-          "label": "Bestellnummer (automatisch erkannt)",
-          "type": "string",
-          "subtype": "text",
-          "fulltype": "string/text",
-          "description": "A string value not longer than 4000 characters (or `null`)."
-        },
-        "bestellung_lieferant": {
-          "identifier": "bestellung_lieferant",
-          "label": "Lieferant (automatisch erkannt)",
-          "type": "string",
-          "subtype": "text",
-          "fulltype": "string/text",
-          "description": "A string value not longer than 4000 characters (or `null`)."
-        },
-        "bestellung_datum": {
-          "identifier": "bestellung_datum",
-          "label": "Bestelldatum (automatisch erkannt)",
-          "type": "date",
-          "subtype": "date",
-          "fulltype": "date/date",
-          "description": "A calendar date consisting of year, month and day. (Or `null`/`None`)\n\nThe field value will be a string in the format `<YYYY>-<MM>-<DD>` or `null`.\n\nFor example: `1642-12-25`."
-        },
-        "bestellung_positionen": {
-          "identifier": "bestellung_positionen",
-          "label": "Bestellpositionen (automatisch erkannt)",
-          "type": "string",
-          "subtype": "textarea",
-          "fulltype": "string/textarea",
-          "description": "A string value that can contain multiple lines of text (or `null`)."
-        }
-      }
-    },
     "auftragsbestaetigung": {
       "app_id": "6974c0030c018953722d51d8",
       "name": "Auftragsbest\u00e4tigung",
       "controls": {
         "ab_pdf": {
           "identifier": "ab_pdf",
-          "label": "Auftragsbest\u00e4tigung-PDF",
+          "label": "Auftragsbest\u00e4tigung-Datei (CSV, Excel oder PDF)",
           "type": "file",
           "subtype": null,
           "fulltype": "file",
-          "description": "An uploaded file. (Or `null`/`None`)\n\nThe field value will be a URL to download the file in the form `https://<hostname>/files/<app-id>/data/<record-id>/<control-identifier>/<internal-id>` or `null`."
+          "description": "An uploaded file. (Or `null`/`None`)\n\nThe field value will be a URL to download the file in the form `https://<hostname>/files/<app-id>/data/<record-id>/<control-identifier>/<internal-id>` or `null`.",
+          "required": null,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
         },
         "ab_ocr_status": {
           "identifier": "ab_ocr_status",
-          "label": "OCR erfolgreich?",
+          "label": "Daten erfolgreich erkannt?",
           "type": "bool",
           "subtype": null,
           "fulltype": "bool",
-          "description": "A boolean value, i.e. `true` or `false` (or `null`)."
+          "description": "A boolean value, i.e. `true` or `false` (or `null`).",
+          "required": null,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
         },
         "ab_nummer": {
           "identifier": "ab_nummer",
@@ -82,7 +42,14 @@
           "type": "string",
           "subtype": "text",
           "fulltype": "string/text",
-          "description": "A string value not longer than 4000 characters (or `null`)."
+          "description": "A string value not longer than 4000 characters (or `null`).",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
         },
         "ab_lieferant": {
           "identifier": "ab_lieferant",
@@ -90,7 +57,14 @@
           "type": "string",
           "subtype": "text",
           "fulltype": "string/text",
-          "description": "A string value not longer than 4000 characters (or `null`)."
+          "description": "A string value not longer than 4000 characters (or `null`).",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
         },
         "ab_datum": {
           "identifier": "ab_datum",
@@ -98,7 +72,14 @@
           "type": "date",
           "subtype": "date",
           "fulltype": "date/date",
-          "description": "A calendar date consisting of year, month and day. (Or `null`/`None`)\n\nThe field value will be a string in the format `<YYYY>-<MM>-<DD>` or `null`.\n\nFor example: `1642-12-25`."
+          "description": "A calendar date consisting of year, month and day. (Or `null`/`None`)\n\nThe field value will be a string in the format `<YYYY>-<MM>-<DD>` or `null`.\n\nFor example: `1642-12-25`.",
+          "required": null,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
         },
         "ab_positionen": {
           "identifier": "ab_positionen",
@@ -106,7 +87,110 @@
           "type": "string",
           "subtype": "textarea",
           "fulltype": "string/textarea",
-          "description": "A string value that can contain multiple lines of text (or `null`)."
+          "description": "A string value that can contain multiple lines of text (or `null`).",
+          "required": null,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
+        }
+      }
+    },
+    "bestellung": {
+      "app_id": "6974bfff33b1830867bd937b",
+      "name": "Bestellung",
+      "controls": {
+        "bestellung_pdf": {
+          "identifier": "bestellung_pdf",
+          "label": "Bestell-Datei (CSV, Excel oder PDF)",
+          "type": "file",
+          "subtype": null,
+          "fulltype": "file",
+          "description": "An uploaded file. (Or `null`/`None`)\n\nThe field value will be a URL to download the file in the form `https://<hostname>/files/<app-id>/data/<record-id>/<control-identifier>/<internal-id>` or `null`.",
+          "required": null,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
+        },
+        "bestellung_ocr_status": {
+          "identifier": "bestellung_ocr_status",
+          "label": "Daten erfolgreich erkannt?",
+          "type": "bool",
+          "subtype": null,
+          "fulltype": "bool",
+          "description": "A boolean value, i.e. `true` or `false` (or `null`).",
+          "required": null,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
+        },
+        "bestellung_nummer": {
+          "identifier": "bestellung_nummer",
+          "label": "Bestellnummer (automatisch erkannt)",
+          "type": "string",
+          "subtype": "text",
+          "fulltype": "string/text",
+          "description": "A string value not longer than 4000 characters (or `null`).",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
+        },
+        "bestellung_lieferant": {
+          "identifier": "bestellung_lieferant",
+          "label": "Lieferant (automatisch erkannt)",
+          "type": "string",
+          "subtype": "text",
+          "fulltype": "string/text",
+          "description": "A string value not longer than 4000 characters (or `null`).",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
+        },
+        "bestellung_datum": {
+          "identifier": "bestellung_datum",
+          "label": "Bestelldatum (automatisch erkannt)",
+          "type": "date",
+          "subtype": "date",
+          "fulltype": "date/date",
+          "description": "A calendar date consisting of year, month and day. (Or `null`/`None`)\n\nThe field value will be a string in the format `<YYYY>-<MM>-<DD>` or `null`.\n\nFor example: `1642-12-25`.",
+          "required": null,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
+        },
+        "bestellung_positionen": {
+          "identifier": "bestellung_positionen",
+          "label": "Bestellpositionen (automatisch erkannt)",
+          "type": "string",
+          "subtype": "textarea",
+          "fulltype": "string/textarea",
+          "description": "A string value that can contain multiple lines of text (or `null`).",
+          "required": null,
+          "in_list": false,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
         }
       }
     },
@@ -121,6 +205,13 @@
           "subtype": "select",
           "fulltype": "applookup/select",
           "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true,
           "lookup_app": "https://my.living-apps.de/rest/apps/6974bfff33b1830867bd937b"
         },
         "abgleich_ab": {
@@ -130,6 +221,13 @@
           "subtype": "select",
           "fulltype": "applookup/select",
           "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true,
           "lookup_app": "https://my.living-apps.de/rest/apps/6974c0030c018953722d51d8"
         },
         "abgleich_status": {
@@ -138,7 +236,14 @@
           "type": "bool",
           "subtype": null,
           "fulltype": "bool",
-          "description": "A boolean value, i.e. `true` or `false` (or `null`)."
+          "description": "A boolean value, i.e. `true` or `false` (or `null`).",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
         },
         "abgleich_abweichungen": {
           "identifier": "abgleich_abweichungen",
@@ -146,16 +251,130 @@
           "type": "string",
           "subtype": "textarea",
           "fulltype": "string/textarea",
-          "description": "A string value that can contain multiple lines of text (or `null`)."
+          "description": "A string value that can contain multiple lines of text (or `null`).",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": null,
+          "in_expert_search": true
+        }
+      }
+    },
+    "abgleich_starten": {
+      "app_id": "697b99e079c6ebbe2c0b68c2",
+      "name": "Abgleich starten",
+      "controls": {
+        "abgleich_bestellung": {
+          "identifier": "abgleich_bestellung",
+          "label": "Bestellung ausw\u00e4hlen",
+          "type": "applookup",
+          "subtype": "select",
+          "fulltype": "applookup/select",
+          "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": false,
+          "in_expert_search": true,
+          "lookup_app": "https://my.living-apps.de/rest/apps/6974bfff33b1830867bd937b"
+        },
+        "abgleich_ab": {
+          "identifier": "abgleich_ab",
+          "label": "Auftragsbest\u00e4tigung ausw\u00e4hlen",
+          "type": "applookup",
+          "subtype": "select",
+          "fulltype": "applookup/select",
+          "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": false,
+          "in_expert_search": true,
+          "lookup_app": "https://my.living-apps.de/rest/apps/6974c0030c018953722d51d8"
+        }
+      }
+    },
+    "abgleichsergebnis": {
+      "app_id": "697b99e14b5173ee3695e8cf",
+      "name": "Abgleichsergebnis",
+      "controls": {
+        "ergebnis_abgleich_referenz": {
+          "identifier": "ergebnis_abgleich_referenz",
+          "label": "Abgleich ausw\u00e4hlen",
+          "type": "applookup",
+          "subtype": "select",
+          "fulltype": "applookup/select",
+          "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": false,
+          "in_expert_search": true,
+          "lookup_app": "https://my.living-apps.de/rest/apps/697b99e079c6ebbe2c0b68c2"
+        },
+        "abgleich_status": {
+          "identifier": "abgleich_status",
+          "label": "Alle Daten stimmen \u00fcberein?",
+          "type": "bool",
+          "subtype": null,
+          "fulltype": "bool",
+          "description": "A boolean value, i.e. `true` or `false` (or `null`).",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": false,
+          "in_expert_search": true
+        },
+        "abgleich_abweichungen": {
+          "identifier": "abgleich_abweichungen",
+          "label": "Abweichungen (tabellarisch angezeigt)",
+          "type": "string",
+          "subtype": "textarea",
+          "fulltype": "string/textarea",
+          "description": "A string value that can contain multiple lines of text (or `null`).",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": false,
+          "in_expert_search": true
+        },
+        "abgleich_weiter": {
+          "identifier": "abgleich_weiter",
+          "label": "Weiter",
+          "type": "bool",
+          "subtype": null,
+          "fulltype": "bool",
+          "description": "A boolean value, i.e. `true` or `false` (or `null`).",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": false,
+          "in_expert_search": true
         }
       }
     }
   },
   "metadata": {
     "apps_list": [
-      "Bestellung",
       "Auftragsbest\u00e4tigung",
-      "Automatischer Abgleich"
+      "Bestellung",
+      "Automatischer Abgleich",
+      "Abgleich starten",
+      "Abgleichsergebnis"
     ]
   }
 }
