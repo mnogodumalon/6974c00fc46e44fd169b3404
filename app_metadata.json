@@ -2,6 +2,73 @@
   "appgroup_id": "6974c00fc46e44fd169b3404",
   "appgroup_name": "Bestellabgleich-System",
   "apps": {
+    "abgleichsergebnis": {
+      "app_id": "697b99e14b5173ee3695e8cf",
+      "name": "Abgleichsergebnis",
+      "controls": {
+        "ergebnis_abgleich_referenz": {
+          "identifier": "ergebnis_abgleich_referenz",
+          "label": "Abgleich ausw\u00e4hlen",
+          "type": "applookup",
+          "subtype": "select",
+          "fulltype": "applookup/select",
+          "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": false,
+          "in_expert_search": true,
+          "lookup_app": "https://my.living-apps.de/rest/apps/697b99e079c6ebbe2c0b68c2"
+        },
+        "abgleich_status": {
+          "identifier": "abgleich_status",
+          "label": "Alle Daten stimmen \u00fcberein?",
+          "type": "bool",
+          "subtype": null,
+          "fulltype": "bool",
+          "description": "A boolean value, i.e. `true` or `false` (or `null`).",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": false,
+          "in_expert_search": true
+        },
+        "abgleich_abweichungen": {
+          "identifier": "abgleich_abweichungen",
+          "label": "Abweichungen (tabellarisch angezeigt)",
+          "type": "string",
+          "subtype": "textarea",
+          "fulltype": "string/textarea",
+          "description": "A string value that can contain multiple lines of text (or `null`).",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": false,
+          "in_expert_search": true
+        },
+        "abgleich_weiter": {
+          "identifier": "abgleich_weiter",
+          "label": "Weiter",
+          "type": "bool",
+          "subtype": null,
+          "fulltype": "bool",
+          "description": "A boolean value, i.e. `true` or `false` (or `null`).",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": false,
+          "in_text": false,
+          "in_structured_search": false,
+          "in_fulltext_search": false,
+          "in_expert_search": true
+        }
+      }
+    },
     "auftragsbestaetigung": {
       "app_id": "6974c0030c018953722d51d8",
       "name": "Auftragsbest\u00e4tigung",
@@ -194,6 +261,44 @@
         }
       }
     },
+    "abgleich_starten": {
+      "app_id": "697b99e079c6ebbe2c0b68c2",
+      "name": "Abgleich starten",
+      "controls": {
+        "abgleich_bestellung": {
+          "identifier": "abgleich_bestellung",
+          "label": "Bestellung ausw\u00e4hlen",
+          "type": "applookup",
+          "subtype": "select",
+          "fulltype": "applookup/select",
+          "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": false,
+          "in_expert_search": true,
+          "lookup_app": "https://my.living-apps.de/rest/apps/6974bfff33b1830867bd937b"
+        },
+        "abgleich_ab": {
+          "identifier": "abgleich_ab",
+          "label": "Auftragsbest\u00e4tigung ausw\u00e4hlen",
+          "type": "applookup",
+          "subtype": "select",
+          "fulltype": "applookup/select",
+          "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
+          "required": null,
+          "in_list": true,
+          "in_mobile_list": true,
+          "in_text": true,
+          "in_structured_search": false,
+          "in_fulltext_search": false,
+          "in_expert_search": true,
+          "lookup_app": "https://my.living-apps.de/rest/apps/6974c0030c018953722d51d8"
+        }
+      }
+    },
     "automatischer_abgleich": {
       "app_id": "6974c003a5ae425a8e64d3b3",
       "name": "Automatischer Abgleich",
@@ -261,120 +366,15 @@
           "in_expert_search": true
         }
       }
-    },
-    "abgleich_starten": {
-      "app_id": "697b99e079c6ebbe2c0b68c2",
-      "name": "Abgleich starten",
-      "controls": {
-        "abgleich_bestellung": {
-          "identifier": "abgleich_bestellung",
-          "label": "Bestellung ausw\u00e4hlen",
-          "type": "applookup",
-          "subtype": "select",
-          "fulltype": "applookup/select",
-          "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
-          "required": null,
-          "in_list": true,
-          "in_mobile_list": true,
-          "in_text": true,
-          "in_structured_search": false,
-          "in_fulltext_search": false,
-          "in_expert_search": true,
-          "lookup_app": "https://my.living-apps.de/rest/apps/6974bfff33b1830867bd937b"
-        },
-        "abgleich_ab": {
-          "identifier": "abgleich_ab",
-          "label": "Auftragsbest\u00e4tigung ausw\u00e4hlen",
-          "type": "applookup",
-          "subtype": "select",
-          "fulltype": "applookup/select",
-          "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
-          "required": null,
-          "in_list": true,
-          "in_mobile_list": true,
-          "in_text": true,
-          "in_structured_search": false,
-          "in_fulltext_search": false,
-          "in_expert_search": true,
-          "lookup_app": "https://my.living-apps.de/rest/apps/6974c0030c018953722d51d8"
-        }
-      }
-    },
-    "abgleichsergebnis": {
-      "app_id": "697b99e14b5173ee3695e8cf",
-      "name": "Abgleichsergebnis",
-      "controls": {
-        "ergebnis_abgleich_referenz": {
-          "identifier": "ergebnis_abgleich_referenz",
-          "label": "Abgleich ausw\u00e4hlen",
-          "type": "applookup",
-          "subtype": "select",
-          "fulltype": "applookup/select",
-          "description": "A reference to another LivingApp record from a target lookup app (or `null`).\n\nThe field value will be a valid record URL in the form `https://<hostname>/rest/apps/<app-id>/records/<record-id>` or `null`.",
-          "required": null,
-          "in_list": true,
-          "in_mobile_list": true,
-          "in_text": true,
-          "in_structured_search": false,
-          "in_fulltext_search": false,
-          "in_expert_search": true,
-          "lookup_app": "https://my.living-apps.de/rest/apps/697b99e079c6ebbe2c0b68c2"
-        },
-        "abgleich_status": {
-          "identifier": "abgleich_status",
-          "label": "Alle Daten stimmen \u00fcberein?",
-          "type": "bool",
-          "subtype": null,
-          "fulltype": "bool",
-          "description": "A boolean value, i.e. `true` or `false` (or `null`).",
-          "required": null,
-          "in_list": true,
-          "in_mobile_list": true,
-          "in_text": true,
-          "in_structured_search": false,
-          "in_fulltext_search": false,
-          "in_expert_search": true
-        },
-        "abgleich_abweichungen": {
-          "identifier": "abgleich_abweichungen",
-          "label": "Abweichungen (tabellarisch angezeigt)",
-          "type": "string",
-          "subtype": "textarea",
-          "fulltype": "string/textarea",
-          "description": "A string value that can contain multiple lines of text (or `null`).",
-          "required": null,
-          "in_list": true,
-          "in_mobile_list": false,
-          "in_text": false,
-          "in_structured_search": false,
-          "in_fulltext_search": false,
-          "in_expert_search": true
-        },
-        "abgleich_weiter": {
-          "identifier": "abgleich_weiter",
-          "label": "Weiter",
-          "type": "bool",
-          "subtype": null,
-          "fulltype": "bool",
-          "description": "A boolean value, i.e. `true` or `false` (or `null`).",
-          "required": null,
-          "in_list": true,
-          "in_mobile_list": false,
-          "in_text": false,
-          "in_structured_search": false,
-          "in_fulltext_search": false,
-          "in_expert_search": true
-        }
-      }
     }
   },
   "metadata": {
     "apps_list": [
+      "Abgleichsergebnis",
       "Auftragsbest\u00e4tigung",
       "Bestellung",
-      "Automatischer Abgleich",
       "Abgleich starten",
-      "Abgleichsergebnis"
+      "Automatischer Abgleich"
     ]
   }
 }

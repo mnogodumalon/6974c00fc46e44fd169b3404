@@ -1,175 +1,257 @@
 import { useState, useEffect, useMemo } from 'react';
-import type { Abgleichsergebnis, AbgleichStarten, Bestellung, Auftragsbestaetigung } from '@/types/app';
+import type { AutomatischerAbgleich, Bestellung, Auftragsbestaetigung } from '@/types/app';
 import { APP_IDS } from '@/types/app';
 import { LivingAppsService, extractRecordId, createRecordUrl } from '@/services/livingAppsService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import {
-  Plus,
-  AlertCircle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
+import {
   CheckCircle2,
-  XCircle,
-  Clock,
+  AlertCircle,
+  Plus,
   ChevronRight,
+  FileText,
+  ClipboardList,
   RefreshCw,
-  FileCheck,
-  FileX,
-  Files
+  BarChart3
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { de } from 'date-fns/locale';
 
-// Progress Ring Component
-function ProgressRing({
+// Semi-circular gauge component for the hero KPI
+function MatchRateGauge({
   percentage,
-  size = 180,
-  strokeWidth = 10
+  total,
+  size = 280,
+  animate = true
 }: {
   percentage: number;
+  total: number;
   size?: number;
-  strokeWidth?: number;
+  animate?: boolean;
 }) {
+  const [displayPercentage, setDisplayPercentage] = useState(0);
+  const strokeWidth = size > 250 ? 12 : 10;
   const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const successOffset = circumference - (percentage / 100) * circumference;
-  const failOffset = circumference - ((100 - percentage) / 100) * circumference;
+  const circumference = Math.PI * radius; // Half circle
+
+  useEffect(() => {
+    if (animate) {
+      const timer = setTimeout(() => {
+        setDisplayPercentage(percentage);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setDisplayPercentage(percentage);
+    }
+  }, [percentage, animate]);
+
+  const strokeDashoffset = circumference - (displayPercentage / 100) * circumference;
 
   return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="transform -rotate-90">
-        {/* Background circle */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
+    <div className="flex flex-col items-center">
+      <svg
+        width={size}
+        height={size / 2 + 20}
+        viewBox={`0 0 ${size} ${size / 2 + 20}`}
+        className="overflow-visible"
+      >
+        {/* Background arc */}
+        <path
+          d={`M ${strokeWidth / 2} ${size / 2} A ${radius} ${radius} 0 0 1 ${size - strokeWidth / 2} ${size / 2}`}
           fill="none"
           stroke="hsl(var(--muted))"
           strokeWidth={strokeWidth}
+          strokeLinecap="round"
         />
-        {/* Success (green) arc */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
+        {/* Progress arc */}
+        <path
+          d={`M ${strokeWidth / 2} ${size / 2} A ${radius} ${radius} 0 0 1 ${size - strokeWidth / 2} ${size / 2}`}
           fill="none"
-          stroke="hsl(158 64% 40%)"
+          stroke="hsl(var(--primary))"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
-          strokeDashoffset={successOffset}
+          strokeDashoffset={strokeDashoffset}
           className="transition-all duration-700 ease-out"
+          style={{
+            filter: 'drop-shadow(0 0 6px hsl(173 58% 39% / 0.3))'
+          }}
         />
-        {/* Failure (red) arc - starts where green ends */}
-        {percentage < 100 && (
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            fill="none"
-            stroke="hsl(0 72% 51%)"
-            strokeWidth={strokeWidth}
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={failOffset}
-            transform={`rotate(${(percentage / 100) * 360} ${size / 2} ${size / 2})`}
-            className="transition-all duration-700 ease-out"
-          />
-        )}
+        {/* Percentage text */}
+        <text
+          x={size / 2}
+          y={size / 2 - 10}
+          textAnchor="middle"
+          className="fill-foreground font-bold"
+          style={{ fontSize: size > 250 ? '64px' : '56px' }}
+        >
+          {Math.round(displayPercentage)}%
+        </text>
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-5xl font-bold tracking-tight">{Math.round(percentage)}%</span>
-        <span className="text-sm text-muted-foreground mt-1">Übereinstimmung</span>
-      </div>
+      <p className="text-sm text-muted-foreground -mt-2">
+        von {total} Abgleichen
+      </p>
     </div>
   );
 }
 
-// Loading State Component
-function LoadingState() {
+// Status badge component
+function StatusBadge({ isMatch }: { isMatch: boolean | null | undefined }) {
+  if (isMatch === true) {
+    return (
+      <Badge
+        variant="outline"
+        className="bg-[hsl(158_64%_42%/0.1)] text-[hsl(158_64%_32%)] border-[hsl(158_64%_42%/0.3)]"
+      >
+        <CheckCircle2 className="w-3 h-3 mr-1" />
+        Übereinstimmend
+      </Badge>
+    );
+  }
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
+    <Badge
+      variant="outline"
+      className="bg-[hsl(38_92%_50%/0.1)] text-[hsl(38_92%_35%)] border-[hsl(38_92%_50%/0.3)]"
+    >
+      <AlertCircle className="w-3 h-3 mr-1" />
+      Abweichungen
+    </Badge>
+  );
+}
+
+// Loading skeleton for the dashboard
+function LoadingSkeleton() {
+  return (
+    <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header skeleton */}
-        <div className="flex justify-between items-center">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-10 w-36" />
-        </div>
+        <Skeleton className="h-8 w-48" />
 
-        {/* Hero skeleton */}
-        <Skeleton className="h-64 w-full rounded-xl" />
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+          <div className="space-y-6">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex justify-center">
+                  <Skeleton className="h-[160px] w-[280px] rounded-full" />
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Stats skeleton */}
-        <div className="grid grid-cols-3 gap-4">
-          <Skeleton className="h-24 rounded-lg" />
-          <Skeleton className="h-24 rounded-lg" />
-          <Skeleton className="h-24 rounded-lg" />
-        </div>
+            <div className="grid grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-20" />
+              ))}
+            </div>
 
-        {/* List skeleton */}
-        <div className="space-y-3">
-          <Skeleton className="h-16 w-full rounded-lg" />
-          <Skeleton className="h-16 w-full rounded-lg" />
-          <Skeleton className="h-16 w-full rounded-lg" />
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-32" />
+              </CardHeader>
+              <CardContent>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Skeleton key={i} className="h-12 mb-2" />
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="hidden lg:block">
+            <Card className="h-full">
+              <CardHeader>
+                <Skeleton className="h-6 w-24" />
+              </CardHeader>
+              <CardContent>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Skeleton key={i} className="h-10 mb-2" />
+                ))}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-// Error State Component
-function ErrorState({ error, onRetry }: { error: Error; onRetry: () => void }) {
+// Empty state component
+function EmptyState({ onAction }: { onAction: () => void }) {
   return (
-    <div className="min-h-screen bg-background p-4 flex items-center justify-center">
-      <Alert variant="destructive" className="max-w-md">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Fehler beim Laden</AlertTitle>
-        <AlertDescription className="mt-2">
-          <p className="mb-3">{error.message}</p>
-          <Button variant="outline" size="sm" onClick={onRetry}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Erneut versuchen
-          </Button>
-        </AlertDescription>
-      </Alert>
-    </div>
-  );
-}
-
-// Empty State Component
-function EmptyState({ onCreateNew }: { onCreateNew: () => void }) {
-  return (
-    <div className="text-center py-12">
-      <Files className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+        <ClipboardList className="w-8 h-8 text-muted-foreground" />
+      </div>
       <h3 className="text-lg font-semibold mb-2">Noch keine Abgleiche</h3>
-      <p className="text-muted-foreground mb-4 max-w-sm mx-auto">
+      <p className="text-muted-foreground mb-6 max-w-sm">
         Starten Sie Ihren ersten Abgleich, um Bestellungen mit Auftragsbestätigungen zu vergleichen.
       </p>
-      <Button onClick={onCreateNew}>
-        <Plus className="h-4 w-4 mr-2" />
-        Neuer Abgleich
+      <Button onClick={onAction}>
+        <Plus className="w-4 h-4 mr-2" />
+        Ersten Abgleich starten
       </Button>
     </div>
   );
 }
 
-// New Comparison Dialog
+// Error state component
+function ErrorState({ error, onRetry }: { error: Error; onRetry: () => void }) {
+  return (
+    <div className="min-h-screen bg-background p-4 md:p-6">
+      <div className="max-w-2xl mx-auto pt-16">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Fehler beim Laden</AlertTitle>
+          <AlertDescription className="mt-2">
+            <p className="mb-4">{error.message}</p>
+            <Button variant="outline" onClick={onRetry}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Erneut versuchen
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    </div>
+  );
+}
+
+// New comparison dialog
 function NewComparisonDialog({
-  open,
-  onOpenChange,
   bestellungen,
   auftragsbestaetigungen,
-  onSubmit
+  onSubmit,
+  open,
+  onOpenChange
 }: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   bestellungen: Bestellung[];
   auftragsbestaetigungen: Auftragsbestaetigung[];
   onSubmit: (bestellungId: string, abId: string) => Promise<void>;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
   const [selectedBestellung, setSelectedBestellung] = useState<string>('');
   const [selectedAB, setSelectedAB] = useState<string>('');
@@ -194,20 +276,19 @@ function NewComparisonDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Neuer Abgleich</DialogTitle>
+          <DialogTitle>Neuen Abgleich starten</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 pt-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Bestellung auswählen</label>
+            <Label htmlFor="bestellung">Bestellung auswählen</Label>
             <Select value={selectedBestellung} onValueChange={setSelectedBestellung}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger id="bestellung">
                 <SelectValue placeholder="Bestellung wählen..." />
               </SelectTrigger>
               <SelectContent>
                 {bestellungen.map((b) => (
                   <SelectItem key={b.record_id} value={b.record_id}>
-                    {b.fields.bestellung_nummer || b.record_id.slice(-8)}
-                    {b.fields.bestellung_lieferant && ` - ${b.fields.bestellung_lieferant}`}
+                    {b.fields.bestellung_nummer || 'Ohne Nummer'} - {b.fields.bestellung_lieferant || 'Unbekannter Lieferant'}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -215,37 +296,36 @@ function NewComparisonDialog({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Auftragsbestätigung auswählen</label>
+            <Label htmlFor="ab">Auftragsbestätigung auswählen</Label>
             <Select value={selectedAB} onValueChange={setSelectedAB}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger id="ab">
                 <SelectValue placeholder="Auftragsbestätigung wählen..." />
               </SelectTrigger>
               <SelectContent>
                 {auftragsbestaetigungen.map((ab) => (
                   <SelectItem key={ab.record_id} value={ab.record_id}>
-                    {ab.fields.ab_nummer || ab.record_id.slice(-8)}
-                    {ab.fields.ab_lieferant && ` - ${ab.fields.ab_lieferant}`}
+                    {ab.fields.ab_nummer || 'Ohne Nummer'} - {ab.fields.ab_lieferant || 'Unbekannter Lieferant'}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-        </div>
-        <div className="flex justify-end gap-3">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Abbrechen
-          </Button>
+
           <Button
             onClick={handleSubmit}
             disabled={!selectedBestellung || !selectedAB || submitting}
+            className="w-full"
           >
             {submitting ? (
               <>
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                Wird erstellt...
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                Wird gestartet...
               </>
             ) : (
-              'Abgleich starten'
+              <>
+                <Plus className="w-4 h-4 mr-2" />
+                Abgleich starten
+              </>
             )}
           </Button>
         </div>
@@ -254,163 +334,105 @@ function NewComparisonDialog({
   );
 }
 
-// Comparison Detail Dialog
+// Comparison detail dialog
 function ComparisonDetailDialog({
-  open,
-  onOpenChange,
   comparison,
   bestellung,
-  auftragsbestaetigung
+  auftragsbestaetigung,
+  open,
+  onOpenChange
 }: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  comparison: Abgleichsergebnis | null;
+  comparison: AutomatischerAbgleich | null;
   bestellung: Bestellung | null;
   auftragsbestaetigung: Auftragsbestaetigung | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
   if (!comparison) return null;
 
-  const isMatch = comparison.fields.abgleich_status === true;
+  const abweichungen = comparison.fields.abgleich_abweichungen?.split('\n').filter(Boolean) || [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {isMatch ? (
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-            ) : (
-              <XCircle className="h-5 w-5 text-destructive" />
-            )}
             Abgleich-Details
+            <StatusBadge isMatch={comparison.fields.abgleich_status} />
           </DialogTitle>
         </DialogHeader>
-
-        <div className="grid md:grid-cols-2 gap-6 py-4">
-          {/* Bestellung Column */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-              Bestellung
-            </h4>
-            <Card>
-              <CardContent className="pt-4 space-y-2">
-                <div>
-                  <span className="text-sm text-muted-foreground">Nummer:</span>
-                  <p className="font-medium">{bestellung?.fields.bestellung_nummer || '-'}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-muted-foreground">Lieferant:</span>
-                  <p className="font-medium">{bestellung?.fields.bestellung_lieferant || '-'}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-muted-foreground">Datum:</span>
-                  <p className="font-medium">
-                    {bestellung?.fields.bestellung_datum
-                      ? format(parseISO(bestellung.fields.bestellung_datum), 'dd.MM.yyyy', { locale: de })
-                      : '-'}
-                  </p>
-                </div>
-                {bestellung?.fields.bestellung_positionen && (
-                  <div>
-                    <span className="text-sm text-muted-foreground">Positionen:</span>
-                    <pre className="mt-1 text-xs bg-muted p-2 rounded overflow-x-auto whitespace-pre-wrap">
-                      {bestellung.fields.bestellung_positionen}
-                    </pre>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+        <div className="space-y-4 pt-2">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-3 rounded-lg bg-muted/50">
+              <p className="text-xs text-muted-foreground mb-1">Bestellung</p>
+              <p className="font-medium">{bestellung?.fields.bestellung_nummer || '-'}</p>
+              <p className="text-sm text-muted-foreground">{bestellung?.fields.bestellung_lieferant || '-'}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-muted/50">
+              <p className="text-xs text-muted-foreground mb-1">Auftragsbestätigung</p>
+              <p className="font-medium">{auftragsbestaetigung?.fields.ab_nummer || '-'}</p>
+              <p className="text-sm text-muted-foreground">{auftragsbestaetigung?.fields.ab_lieferant || '-'}</p>
+            </div>
           </div>
 
-          {/* Auftragsbestätigung Column */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-              Auftragsbestätigung
-            </h4>
-            <Card>
-              <CardContent className="pt-4 space-y-2">
-                <div>
-                  <span className="text-sm text-muted-foreground">Nummer:</span>
-                  <p className="font-medium">{auftragsbestaetigung?.fields.ab_nummer || '-'}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-muted-foreground">Lieferant:</span>
-                  <p className="font-medium">{auftragsbestaetigung?.fields.ab_lieferant || '-'}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-muted-foreground">Datum:</span>
-                  <p className="font-medium">
-                    {auftragsbestaetigung?.fields.ab_datum
-                      ? format(parseISO(auftragsbestaetigung.fields.ab_datum), 'dd.MM.yyyy', { locale: de })
-                      : '-'}
-                  </p>
-                </div>
-                {auftragsbestaetigung?.fields.ab_positionen && (
-                  <div>
-                    <span className="text-sm text-muted-foreground">Positionen:</span>
-                    <pre className="mt-1 text-xs bg-muted p-2 rounded overflow-x-auto whitespace-pre-wrap">
-                      {auftragsbestaetigung.fields.ab_positionen}
-                    </pre>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+          {!comparison.fields.abgleich_status && abweichungen.length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-2">Abweichungen ({abweichungen.length})</p>
+              <div className="border rounded-lg overflow-hidden">
+                <Table>
+                  <TableBody>
+                    {abweichungen.map((abw, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="py-2 text-sm">{abw}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          )}
+
+          {comparison.fields.abgleich_status && (
+            <div className="flex items-center gap-2 p-4 rounded-lg bg-[hsl(158_64%_42%/0.1)]">
+              <CheckCircle2 className="w-5 h-5 text-[hsl(158_64%_32%)]" />
+              <p className="text-sm text-[hsl(158_64%_32%)]">
+                Alle Daten stimmen überein. Keine Abweichungen gefunden.
+              </p>
+            </div>
+          )}
+
+          <p className="text-xs text-muted-foreground">
+            Erstellt am {format(parseISO(comparison.createdat), 'PPP', { locale: de })}
+          </p>
         </div>
-
-        {/* Discrepancies Section */}
-        {!isMatch && comparison.fields.abgleich_abweichungen && (
-          <div className="border-t pt-4">
-            <h4 className="font-semibold text-destructive mb-2 flex items-center gap-2">
-              <AlertCircle className="h-4 w-4" />
-              Abweichungen
-            </h4>
-            <Card className="border-destructive/30 bg-destructive/5">
-              <CardContent className="pt-4">
-                <pre className="text-sm whitespace-pre-wrap">
-                  {comparison.fields.abgleich_abweichungen}
-                </pre>
-              </CardContent>
-            </Card>
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );
 }
 
-// Main Dashboard Component
+// Main Dashboard component
 export default function Dashboard() {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const [abgleichsergebnisse, setAbgleichsergebnisse] = useState<Abgleichsergebnis[]>([]);
-  const [abgleichStarten, setAbgleichStarten] = useState<AbgleichStarten[]>([]);
+  const [abgleiche, setAbgleiche] = useState<AutomatischerAbgleich[]>([]);
   const [bestellungen, setBestellungen] = useState<Bestellung[]>([]);
   const [auftragsbestaetigungen, setAuftragsbestaetigungen] = useState<Auftragsbestaetigung[]>([]);
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedComparison, setSelectedComparison] = useState<AutomatischerAbgleich | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  const [selectedComparison, setSelectedComparison] = useState<Abgleichsergebnis | null>(null);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'match' | 'mismatch'>('all');
 
-  // Fetch all data
   const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
-
-      const [ergebnisse, starten, orders, confirmations] = await Promise.all([
-        LivingAppsService.getAbgleichsergebnis(),
-        LivingAppsService.getAbgleichStarten(),
+      const [abgleicheData, bestellungenData, abData] = await Promise.all([
+        LivingAppsService.getAutomatischerAbgleich(),
         LivingAppsService.getBestellung(),
         LivingAppsService.getAuftragsbestaetigung(),
       ]);
-
-      setAbgleichsergebnisse(ergebnisse);
-      setAbgleichStarten(starten);
-      setBestellungen(orders);
-      setAuftragsbestaetigungen(confirmations);
+      setAbgleiche(abgleicheData);
+      setBestellungen(bestellungenData);
+      setAuftragsbestaetigungen(abData);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Unbekannter Fehler'));
     } finally {
@@ -429,86 +451,60 @@ export default function Dashboard() {
     return map;
   }, [bestellungen]);
 
-  const auftragsbestaetigungMap = useMemo(() => {
+  const abMap = useMemo(() => {
     const map = new Map<string, Auftragsbestaetigung>();
     auftragsbestaetigungen.forEach(ab => map.set(ab.record_id, ab));
     return map;
   }, [auftragsbestaetigungen]);
 
-  const abgleichStartenMap = useMemo(() => {
-    const map = new Map<string, AbgleichStarten>();
-    abgleichStarten.forEach(as => map.set(as.record_id, as));
-    return map;
-  }, [abgleichStarten]);
-
   // Calculate KPIs
   const stats = useMemo(() => {
-    const total = abgleichsergebnisse.length;
-    const matched = abgleichsergebnisse.filter(e => e.fields.abgleich_status === true).length;
-    const mismatched = abgleichsergebnisse.filter(e => e.fields.abgleich_status === false).length;
-    const pending = abgleichsergebnisse.filter(e => e.fields.abgleich_weiter !== true).length;
-    const matchRate = total > 0 ? (matched / total) * 100 : 100;
+    const total = abgleiche.length;
+    const matching = abgleiche.filter(a => a.fields.abgleich_status === true).length;
+    const withDiscrepancies = abgleiche.filter(a => a.fields.abgleich_status === false).length;
+    const matchRate = total > 0 ? (matching / total) * 100 : 0;
+    return { total, matching, withDiscrepancies, matchRate };
+  }, [abgleiche]);
 
-    return { total, matched, mismatched, pending, matchRate };
-  }, [abgleichsergebnisse]);
-
-  // Filter and enrich comparisons
-  const enrichedComparisons = useMemo(() => {
-    return abgleichsergebnisse
-      .filter(e => {
-        if (statusFilter === 'match') return e.fields.abgleich_status === true;
-        if (statusFilter === 'mismatch') return e.fields.abgleich_status === false;
-        return true;
-      })
-      .map(ergebnis => {
-        // Get the AbgleichStarten record
-        const abgleichRefId = extractRecordId(ergebnis.fields.ergebnis_abgleich_referenz);
-        const abgleichStartenRecord = abgleichRefId ? abgleichStartenMap.get(abgleichRefId) : null;
-
-        // Get linked Bestellung and Auftragsbestaetigung
-        const bestellungId = abgleichStartenRecord
-          ? extractRecordId(abgleichStartenRecord.fields.abgleich_bestellung)
-          : null;
-        const auftragsbestaetigungId = abgleichStartenRecord
-          ? extractRecordId(abgleichStartenRecord.fields.abgleich_ab)
-          : null;
-
-        const bestellung = bestellungId ? bestellungMap.get(bestellungId) : null;
-        const auftragsbestaetigung = auftragsbestaetigungId ? auftragsbestaetigungMap.get(auftragsbestaetigungId) : null;
-
+  // Enrich comparisons with linked data
+  const enrichedAbgleiche = useMemo(() => {
+    return abgleiche
+      .map(abgleich => {
+        const bestellungId = extractRecordId(abgleich.fields.abgleich_bestellung);
+        const abId = extractRecordId(abgleich.fields.abgleich_ab);
         return {
-          ...ergebnis,
-          bestellung,
-          auftragsbestaetigung
+          ...abgleich,
+          bestellung: bestellungId ? bestellungMap.get(bestellungId) : null,
+          auftragsbestaetigung: abId ? abMap.get(abId) : null,
         };
       })
       .sort((a, b) => new Date(b.createdat).getTime() - new Date(a.createdat).getTime());
-  }, [abgleichsergebnisse, abgleichStartenMap, bestellungMap, auftragsbestaetigungMap, statusFilter]);
+  }, [abgleiche, bestellungMap, abMap]);
 
-  // Handle create new comparison
-  const handleCreateComparison = async (bestellungId: string, abId: string) => {
+  // Handle new comparison
+  const handleNewComparison = async (bestellungId: string, abId: string) => {
     await LivingAppsService.createAbgleichStartenEntry({
       abgleich_bestellung: createRecordUrl(APP_IDS.BESTELLUNG, bestellungId),
       abgleich_ab: createRecordUrl(APP_IDS.AUFTRAGSBESTAETIGUNG, abId),
     });
-    // Refresh data
+    // Refresh data after creating
     await fetchData();
   };
 
-  // Handle view detail
-  const handleViewDetail = (comparison: typeof enrichedComparisons[0]) => {
+  // Handle row click
+  const handleRowClick = (comparison: AutomatischerAbgleich) => {
     setSelectedComparison(comparison);
     setDetailDialogOpen(true);
   };
 
-  if (loading) return <LoadingState />;
+  if (loading) return <LoadingSkeleton />;
   if (error) return <ErrorState error={error} onRetry={fetchData} />;
 
   const selectedBestellung = selectedComparison
-    ? enrichedComparisons.find(c => c.record_id === selectedComparison.record_id)?.bestellung || null
+    ? bestellungMap.get(extractRecordId(selectedComparison.fields.abgleich_bestellung) || '')
     : null;
-  const selectedAuftragsbestaetigung = selectedComparison
-    ? enrichedComparisons.find(c => c.record_id === selectedComparison.record_id)?.auftragsbestaetigung || null
+  const selectedAB = selectedComparison
+    ? abMap.get(extractRecordId(selectedComparison.fields.abgleich_ab) || '')
     : null;
 
   return (
@@ -516,335 +512,340 @@ export default function Dashboard() {
       {/* Mobile Layout */}
       <div className="lg:hidden">
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-background border-b px-4 py-3 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-background border-b px-4 py-3">
           <h1 className="text-xl font-semibold">Bestellabgleich</h1>
-          <Button size="icon" variant="ghost" onClick={() => setDialogOpen(true)}>
-            <Plus className="h-5 w-5" />
-          </Button>
-        </header>
-
-        <div className="p-4 space-y-6 pb-24">
-          {/* Hero Section - Progress Ring */}
-          <div className="flex flex-col items-center py-8">
-            <ProgressRing percentage={stats.matchRate} size={180} strokeWidth={10} />
-          </div>
-
-          {/* Quick Stats Row */}
-          <div className="flex items-center justify-center gap-6 py-2">
-            <div className="text-center">
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <div className="text-xs text-muted-foreground">Abgleiche</div>
-            </div>
-            <div className="w-px h-8 bg-border" />
-            <div className="text-center">
-              <div className="text-2xl font-bold text-destructive">{stats.mismatched}</div>
-              <div className="text-xs text-muted-foreground">Abweichungen</div>
-            </div>
-            <div className="w-px h-8 bg-border" />
-            <div className="text-center">
-              <div className="text-2xl font-bold text-amber-600">{stats.pending}</div>
-              <div className="text-xs text-muted-foreground">Offen</div>
-            </div>
-          </div>
-
-          {/* Recent Comparisons */}
-          <section>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-semibold">Aktuelle Abgleiche</h2>
-              <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}>
-                <SelectTrigger className="w-32 h-8 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle</SelectItem>
-                  <SelectItem value="match">Übereinstimmend</SelectItem>
-                  <SelectItem value="mismatch">Abweichend</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {enrichedComparisons.length === 0 ? (
-              <EmptyState onCreateNew={() => setDialogOpen(true)} />
-            ) : (
-              <div className="space-y-2">
-                {enrichedComparisons.slice(0, 10).map((comparison) => {
-                  const isMatch = comparison.fields.abgleich_status === true;
-                  return (
-                    <Card
-                      key={comparison.record_id}
-                      className="cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]"
-                      onClick={() => handleViewDetail(comparison)}
-                    >
-                      <CardContent className="p-3 flex items-center gap-3">
-                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isMatch ? 'bg-green-500' : 'bg-destructive'}`} />
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm truncate">
-                            {comparison.bestellung?.fields.bestellung_nummer || 'Bestellung'}
-                          </div>
-                          <div className="text-xs text-muted-foreground truncate">
-                            AB: {comparison.auftragsbestaetigung?.fields.ab_nummer || '-'}
-                            {comparison.bestellung?.fields.bestellung_lieferant && (
-                              <span> · {comparison.bestellung.fields.bestellung_lieferant}</span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {format(parseISO(comparison.createdat), 'dd.MM.', { locale: de })}
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </section>
         </div>
 
-        {/* FAB */}
-        <Button
-          size="lg"
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg"
-          onClick={() => setDialogOpen(true)}
-        >
-          <Plus className="h-6 w-6" />
-        </Button>
+        <div className="p-4 pb-24 space-y-4">
+          {/* Hero Gauge */}
+          <Card className="shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-medium text-muted-foreground text-center">
+                Übereinstimmungsrate
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <MatchRateGauge
+                percentage={stats.matchRate}
+                total={stats.total}
+                size={200}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Status badges - horizontal scroll */}
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
+            <div className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full bg-muted">
+              <BarChart3 className="w-4 h-4 text-muted-foreground" />
+              <span className="font-semibold">{stats.total}</span>
+              <span className="text-sm text-muted-foreground">Gesamt</span>
+            </div>
+            <div className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(158_64%_42%/0.1)]">
+              <CheckCircle2 className="w-4 h-4 text-[hsl(158_64%_32%)]" />
+              <span className="font-semibold text-[hsl(158_64%_32%)]">{stats.matching}</span>
+              <span className="text-sm text-[hsl(158_64%_32%)]">OK</span>
+            </div>
+            <div className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(38_92%_50%/0.1)]">
+              <AlertCircle className="w-4 h-4 text-[hsl(38_92%_35%)]" />
+              <span className="font-semibold text-[hsl(38_92%_35%)]">{stats.withDiscrepancies}</span>
+              <span className="text-sm text-[hsl(38_92%_35%)]">Abweichungen</span>
+            </div>
+          </div>
+
+          {/* Recent comparisons */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-semibold">Letzte Abgleiche</h2>
+            </div>
+
+            {enrichedAbgleiche.length === 0 ? (
+              <EmptyState onAction={() => setDialogOpen(true)} />
+            ) : (
+              <div className="space-y-2">
+                {enrichedAbgleiche.slice(0, 10).map((abgleich) => (
+                  <Card
+                    key={abgleich.record_id}
+                    className="cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]"
+                    onClick={() => handleRowClick(abgleich)}
+                  >
+                    <CardContent className="p-3 flex items-center gap-3">
+                      <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                        abgleich.fields.abgleich_status
+                          ? 'bg-[hsl(158_64%_42%)]'
+                          : 'bg-[hsl(38_92%_50%)]'
+                      }`} />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">
+                          {abgleich.bestellung?.fields.bestellung_nummer || 'Unbekannt'}
+                        </p>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {abgleich.bestellung?.fields.bestellung_lieferant || 'Unbekannter Lieferant'}
+                        </p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-sm text-muted-foreground">
+                          {format(parseISO(abgleich.createdat), 'd. MMM', { locale: de })}
+                        </p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Fixed bottom action button */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t safe-area-inset-bottom">
+          <Button
+            className="w-full h-[52px] text-base"
+            onClick={() => setDialogOpen(true)}
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Neuen Abgleich starten
+          </Button>
+        </div>
       </div>
 
       {/* Desktop Layout */}
       <div className="hidden lg:block">
-        <div className="max-w-7xl mx-auto p-8">
-          <div className="flex gap-8">
-            {/* Left Column (65%) */}
-            <div className="flex-1 space-y-6">
-              {/* Hero Card */}
-              <Card className="shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-8">
-                    <ProgressRing percentage={stats.matchRate} size={200} strokeWidth={10} />
-                    <div className="flex-1">
-                      <div className="text-6xl font-bold tracking-tight">{Math.round(stats.matchRate)}%</div>
-                      <div className="text-lg text-muted-foreground mt-1">Übereinstimmung</div>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {stats.matched} von {stats.total} Abgleichen erfolgreich
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+        <div className="max-w-7xl mx-auto p-6">
+          {/* Header with action */}
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-semibold">Bestellabgleich</h1>
+            <Button onClick={() => setDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Neuen Abgleich starten
+            </Button>
+          </div>
 
-              {/* Secondary KPIs */}
-              <div className="grid grid-cols-3 gap-4">
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <Files className="h-4 w-4" />
-                      Gesamt-Abgleiche
+          <div className="grid grid-cols-[1fr_320px] gap-6">
+            {/* Left column - main content */}
+            <div className="space-y-6">
+              {/* Top row: Hero + KPIs */}
+              <div className="grid grid-cols-[1fr_200px] gap-6">
+                {/* Hero Gauge */}
+                <Card className="shadow-sm">
+                  <CardHeader className="pb-0">
+                    <CardTitle className="text-base font-medium text-muted-foreground">
+                      Übereinstimmungsrate
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold">{stats.total}</div>
+                  <CardContent className="flex justify-center py-4">
+                    <MatchRateGauge
+                      percentage={stats.matchRate}
+                      total={stats.total}
+                      size={280}
+                    />
                   </CardContent>
                 </Card>
 
-                <Card className={`hover:shadow-md transition-shadow ${stats.mismatched > 0 ? 'border-destructive/30' : ''}`}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <FileX className="h-4 w-4" />
-                      Abweichungen
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className={`text-3xl font-bold ${stats.mismatched > 0 ? 'text-destructive' : ''}`}>
-                      {stats.mismatched}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className={`hover:shadow-md transition-shadow ${stats.pending > 0 ? 'border-amber-400/30' : ''}`}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      Ausstehend
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className={`text-3xl font-bold ${stats.pending > 0 ? 'text-amber-600' : ''}`}>
-                      {stats.pending}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Comparisons List */}
-              <section>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold">Aktuelle Abgleiche</h2>
-                </div>
-
-                {enrichedComparisons.length === 0 ? (
-                  <Card>
-                    <CardContent className="p-8">
-                      <EmptyState onCreateNew={() => setDialogOpen(true)} />
+                {/* Quick Stats */}
+                <div className="space-y-4">
+                  <Card className="shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                          <BarChart3 className="w-5 h-5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold">{stats.total}</p>
+                          <p className="text-sm text-muted-foreground">Gesamt Abgleiche</p>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
-                ) : (
-                  <Card>
-                    <div className="divide-y">
-                      {/* Table Header */}
-                      <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-muted/50 text-sm font-medium text-muted-foreground">
-                        <div className="col-span-1">Status</div>
-                        <div className="col-span-2">Bestellnummer</div>
-                        <div className="col-span-2">AB-Nummer</div>
-                        <div className="col-span-3">Lieferant</div>
-                        <div className="col-span-2">Datum</div>
-                        <div className="col-span-2">Abweichungen</div>
+
+                  <Card className="shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-[hsl(158_64%_42%/0.1)] flex items-center justify-center">
+                          <CheckCircle2 className="w-5 h-5 text-[hsl(158_64%_32%)]" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-[hsl(158_64%_32%)]">{stats.matching}</p>
+                          <p className="text-sm text-muted-foreground">Übereinstimmend</p>
+                        </div>
                       </div>
-
-                      {/* Table Rows */}
-                      {enrichedComparisons.map((comparison) => {
-                        const isMatch = comparison.fields.abgleich_status === true;
-                        return (
-                          <div
-                            key={comparison.record_id}
-                            className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-muted/30 cursor-pointer transition-colors items-center"
-                            onClick={() => handleViewDetail(comparison)}
-                          >
-                            <div className="col-span-1">
-                              {isMatch ? (
-                                <CheckCircle2 className="h-5 w-5 text-green-600" />
-                              ) : (
-                                <XCircle className="h-5 w-5 text-destructive" />
-                              )}
-                            </div>
-                            <div className="col-span-2 font-medium">
-                              {comparison.bestellung?.fields.bestellung_nummer || '-'}
-                            </div>
-                            <div className="col-span-2 text-muted-foreground">
-                              {comparison.auftragsbestaetigung?.fields.ab_nummer || '-'}
-                            </div>
-                            <div className="col-span-3 truncate">
-                              {comparison.bestellung?.fields.bestellung_lieferant || '-'}
-                            </div>
-                            <div className="col-span-2 text-muted-foreground">
-                              {format(parseISO(comparison.createdat), 'dd.MM.yyyy', { locale: de })}
-                            </div>
-                            <div className="col-span-2">
-                              {isMatch ? (
-                                <Badge variant="outline" className="text-green-600 border-green-300">
-                                  Keine
-                                </Badge>
-                              ) : (
-                                <Badge variant="destructive">
-                                  Vorhanden
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    </CardContent>
                   </Card>
-                )}
-              </section>
+
+                  <Card className={`shadow-sm ${stats.withDiscrepancies > 0 ? 'ring-2 ring-[hsl(38_92%_50%/0.3)]' : ''}`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-[hsl(38_92%_50%/0.1)] flex items-center justify-center">
+                          <AlertCircle className="w-5 h-5 text-[hsl(38_92%_35%)]" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-[hsl(38_92%_35%)]">{stats.withDiscrepancies}</p>
+                          <p className="text-sm text-muted-foreground">Mit Abweichungen</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+
+              {/* Comparisons table */}
+              <Card className="shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg">Letzte Abgleiche</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {enrichedAbgleiche.length === 0 ? (
+                    <EmptyState onAction={() => setDialogOpen(true)} />
+                  ) : (
+                    <div className="border rounded-lg overflow-hidden">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-muted/50">
+                            <TableHead className="w-[100px]">Status</TableHead>
+                            <TableHead>Bestellnummer</TableHead>
+                            <TableHead>AB-Nummer</TableHead>
+                            <TableHead>Lieferant</TableHead>
+                            <TableHead>Datum</TableHead>
+                            <TableHead className="text-right">Abweichungen</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {enrichedAbgleiche.slice(0, 10).map((abgleich) => {
+                            const abweichungenCount = abgleich.fields.abgleich_abweichungen
+                              ?.split('\n').filter(Boolean).length || 0;
+                            return (
+                              <TableRow
+                                key={abgleich.record_id}
+                                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                                onClick={() => handleRowClick(abgleich)}
+                              >
+                                <TableCell>
+                                  <div className={`w-2.5 h-2.5 rounded-full ${
+                                    abgleich.fields.abgleich_status
+                                      ? 'bg-[hsl(158_64%_42%)]'
+                                      : 'bg-[hsl(38_92%_50%)]'
+                                  }`} />
+                                </TableCell>
+                                <TableCell className="font-medium">
+                                  {abgleich.bestellung?.fields.bestellung_nummer || '-'}
+                                </TableCell>
+                                <TableCell>
+                                  {abgleich.auftragsbestaetigung?.fields.ab_nummer || '-'}
+                                </TableCell>
+                                <TableCell>
+                                  {abgleich.bestellung?.fields.bestellung_lieferant || '-'}
+                                </TableCell>
+                                <TableCell>
+                                  {format(parseISO(abgleich.createdat), 'dd.MM.yyyy', { locale: de })}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  {abgleich.fields.abgleich_status ? (
+                                    <span className="text-muted-foreground">Keine</span>
+                                  ) : (
+                                    <Badge variant="secondary" className="bg-[hsl(38_92%_50%/0.1)] text-[hsl(38_92%_35%)]">
+                                      {abweichungenCount}
+                                    </Badge>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Right Column (35%) - Sidebar */}
-            <div className="w-80 flex-shrink-0 space-y-6">
-              {/* Primary Action */}
-              <Button className="w-full h-12 text-base" onClick={() => setDialogOpen(true)}>
-                <Plus className="h-5 w-5 mr-2" />
-                Neuer Abgleich
-              </Button>
+            {/* Right sidebar - documents */}
+            <Card className="shadow-sm h-fit">
+              <CardHeader>
+                <CardTitle className="text-lg">Dokumente</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="bestellungen">
+                  <TabsList className="w-full">
+                    <TabsTrigger value="bestellungen" className="flex-1">Bestellungen</TabsTrigger>
+                    <TabsTrigger value="bestaetigungen" className="flex-1">Bestätigungen</TabsTrigger>
+                  </TabsList>
 
-              {/* Filters */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Filter</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Status</label>
-                    <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Alle anzeigen</SelectItem>
-                        <SelectItem value="match">Übereinstimmend</SelectItem>
-                        <SelectItem value="mismatch">Abweichend</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardContent>
-              </Card>
+                  <TabsContent value="bestellungen" className="mt-4 space-y-2">
+                    {bestellungen.slice(0, 5).map((b) => (
+                      <div
+                        key={b.record_id}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                        onClick={() => setDialogOpen(true)}
+                      >
+                        <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {b.fields.bestellung_nummer || 'Ohne Nummer'}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {b.fields.bestellung_lieferant || '-'}
+                          </p>
+                        </div>
+                        {b.fields.bestellung_ocr_status && (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[hsl(158_64%_42%)] flex-shrink-0" />
+                        )}
+                      </div>
+                    ))}
+                    {bestellungen.length === 0 && (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        Keine Bestellungen vorhanden
+                      </p>
+                    )}
+                  </TabsContent>
 
-              {/* Quick Summary */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Übersicht</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between py-2 border-b">
-                    <span className="text-sm text-muted-foreground flex items-center gap-2">
-                      <FileCheck className="h-4 w-4 text-green-600" />
-                      Erfolgreich
-                    </span>
-                    <span className="font-semibold">{stats.matched}</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2 border-b">
-                    <span className="text-sm text-muted-foreground flex items-center gap-2">
-                      <FileX className="h-4 w-4 text-destructive" />
-                      Mit Abweichungen
-                    </span>
-                    <span className="font-semibold">{stats.mismatched}</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-sm text-muted-foreground flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-amber-600" />
-                      Ausstehend
-                    </span>
-                    <span className="font-semibold">{stats.pending}</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Document Counts */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Dokumente</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between py-2 border-b">
-                    <span className="text-sm text-muted-foreground">Bestellungen</span>
-                    <span className="font-semibold">{bestellungen.length}</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-sm text-muted-foreground">Auftragsbestätigungen</span>
-                    <span className="font-semibold">{auftragsbestaetigungen.length}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                  <TabsContent value="bestaetigungen" className="mt-4 space-y-2">
+                    {auftragsbestaetigungen.slice(0, 5).map((ab) => (
+                      <div
+                        key={ab.record_id}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                        onClick={() => setDialogOpen(true)}
+                      >
+                        <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {ab.fields.ab_nummer || 'Ohne Nummer'}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {ab.fields.ab_lieferant || '-'}
+                          </p>
+                        </div>
+                        {ab.fields.ab_ocr_status && (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[hsl(158_64%_42%)] flex-shrink-0" />
+                        )}
+                      </div>
+                    ))}
+                    {auftragsbestaetigungen.length === 0 && (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        Keine Bestätigungen vorhanden
+                      </p>
+                    )}
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
 
       {/* Dialogs */}
       <NewComparisonDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
         bestellungen={bestellungen}
         auftragsbestaetigungen={auftragsbestaetigungen}
-        onSubmit={handleCreateComparison}
+        onSubmit={handleNewComparison}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
       />
 
       <ComparisonDetailDialog
+        comparison={selectedComparison}
+        bestellung={selectedBestellung || null}
+        auftragsbestaetigung={selectedAB || null}
         open={detailDialogOpen}
         onOpenChange={setDetailDialogOpen}
-        comparison={selectedComparison}
-        bestellung={selectedBestellung}
-        auftragsbestaetigung={selectedAuftragsbestaetigung}
       />
     </div>
   );

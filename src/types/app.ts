@@ -1,5 +1,17 @@
 // AUTOMATICALLY GENERATED TYPES - DO NOT EDIT
 
+export interface Abgleichsergebnis {
+  record_id: string;
+  createdat: string;
+  updatedat: string | null;
+  fields: {
+    ergebnis_abgleich_referenz?: string; // applookup -> URL zu 'AbgleichStarten' Record
+    abgleich_status?: boolean;
+    abgleich_abweichungen?: string;
+    abgleich_weiter?: boolean;
+  };
+}
+
 export interface Auftragsbestaetigung {
   record_id: string;
   createdat: string;
@@ -28,6 +40,16 @@ export interface Bestellung {
   };
 }
 
+export interface AbgleichStarten {
+  record_id: string;
+  createdat: string;
+  updatedat: string | null;
+  fields: {
+    abgleich_bestellung?: string; // applookup -> URL zu 'Bestellung' Record
+    abgleich_ab?: string; // applookup -> URL zu 'Auftragsbestaetigung' Record
+  };
+}
+
 export interface AutomatischerAbgleich {
   record_id: string;
   createdat: string;
@@ -40,39 +62,17 @@ export interface AutomatischerAbgleich {
   };
 }
 
-export interface AbgleichStarten {
-  record_id: string;
-  createdat: string;
-  updatedat: string | null;
-  fields: {
-    abgleich_bestellung?: string; // applookup -> URL zu 'Bestellung' Record
-    abgleich_ab?: string; // applookup -> URL zu 'Auftragsbestaetigung' Record
-  };
-}
-
-export interface Abgleichsergebnis {
-  record_id: string;
-  createdat: string;
-  updatedat: string | null;
-  fields: {
-    ergebnis_abgleich_referenz?: string; // applookup -> URL zu 'AbgleichStarten' Record
-    abgleich_status?: boolean;
-    abgleich_abweichungen?: string;
-    abgleich_weiter?: boolean;
-  };
-}
-
 export const APP_IDS = {
+  ABGLEICHSERGEBNIS: '697b99e14b5173ee3695e8cf',
   AUFTRAGSBESTAETIGUNG: '6974c0030c018953722d51d8',
   BESTELLUNG: '6974bfff33b1830867bd937b',
-  AUTOMATISCHER_ABGLEICH: '6974c003a5ae425a8e64d3b3',
   ABGLEICH_STARTEN: '697b99e079c6ebbe2c0b68c2',
-  ABGLEICHSERGEBNIS: '697b99e14b5173ee3695e8cf',
+  AUTOMATISCHER_ABGLEICH: '6974c003a5ae425a8e64d3b3',
 } as const;
 
 // Helper Types for creating new records
+export type CreateAbgleichsergebnis = Abgleichsergebnis['fields'];
 export type CreateAuftragsbestaetigung = Auftragsbestaetigung['fields'];
 export type CreateBestellung = Bestellung['fields'];
-export type CreateAutomatischerAbgleich = AutomatischerAbgleich['fields'];
 export type CreateAbgleichStarten = AbgleichStarten['fields'];
-export type CreateAbgleichsergebnis = Abgleichsergebnis['fields'];
+export type CreateAutomatischerAbgleich = AutomatischerAbgleich['fields'];

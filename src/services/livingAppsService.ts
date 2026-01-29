@@ -1,6 +1,6 @@
 // AUTOMATICALLY GENERATED SERVICE
 import { APP_IDS } from '@/types/app';
-import type { Auftragsbestaetigung, Bestellung, AutomatischerAbgleich, AbgleichStarten, Abgleichsergebnis } from '@/types/app';
+import type { Abgleichsergebnis, Auftragsbestaetigung, Bestellung, AbgleichStarten, AutomatischerAbgleich } from '@/types/app';
 
 // Base Configuration
 const API_BASE_URL = 'https://my.living-apps.de/rest';
@@ -31,6 +31,27 @@ async function callApi(method: string, endpoint: string, data?: any) {
 }
 
 export class LivingAppsService {
+  // --- ABGLEICHSERGEBNIS ---
+  static async getAbgleichsergebnis(): Promise<Abgleichsergebnis[]> {
+    const data = await callApi('GET', `/apps/${APP_IDS.ABGLEICHSERGEBNIS}/records`);
+    return Object.entries(data).map(([id, rec]: [string, any]) => ({
+      record_id: id, ...rec
+    }));
+  }
+  static async getAbgleichsergebni(id: string): Promise<Abgleichsergebnis | undefined> {
+    const data = await callApi('GET', `/apps/${APP_IDS.ABGLEICHSERGEBNIS}/records/${id}`);
+    return { record_id: data.id, ...data };
+  }
+  static async createAbgleichsergebni(fields: Abgleichsergebnis['fields']) {
+    return callApi('POST', `/apps/${APP_IDS.ABGLEICHSERGEBNIS}/records`, { fields });
+  }
+  static async updateAbgleichsergebni(id: string, fields: Partial<Abgleichsergebnis['fields']>) {
+    return callApi('PATCH', `/apps/${APP_IDS.ABGLEICHSERGEBNIS}/records/${id}`, { fields });
+  }
+  static async deleteAbgleichsergebni(id: string) {
+    return callApi('DELETE', `/apps/${APP_IDS.ABGLEICHSERGEBNIS}/records/${id}`);
+  }
+
   // --- AUFTRAGSBESTAETIGUNG ---
   static async getAuftragsbestaetigung(): Promise<Auftragsbestaetigung[]> {
     const data = await callApi('GET', `/apps/${APP_IDS.AUFTRAGSBESTAETIGUNG}/records`);
@@ -73,27 +94,6 @@ export class LivingAppsService {
     return callApi('DELETE', `/apps/${APP_IDS.BESTELLUNG}/records/${id}`);
   }
 
-  // --- AUTOMATISCHER_ABGLEICH ---
-  static async getAutomatischerAbgleich(): Promise<AutomatischerAbgleich[]> {
-    const data = await callApi('GET', `/apps/${APP_IDS.AUTOMATISCHER_ABGLEICH}/records`);
-    return Object.entries(data).map(([id, rec]: [string, any]) => ({
-      record_id: id, ...rec
-    }));
-  }
-  static async getAutomatischerAbgleichEntry(id: string): Promise<AutomatischerAbgleich | undefined> {
-    const data = await callApi('GET', `/apps/${APP_IDS.AUTOMATISCHER_ABGLEICH}/records/${id}`);
-    return { record_id: data.id, ...data };
-  }
-  static async createAutomatischerAbgleichEntry(fields: AutomatischerAbgleich['fields']) {
-    return callApi('POST', `/apps/${APP_IDS.AUTOMATISCHER_ABGLEICH}/records`, { fields });
-  }
-  static async updateAutomatischerAbgleichEntry(id: string, fields: Partial<AutomatischerAbgleich['fields']>) {
-    return callApi('PATCH', `/apps/${APP_IDS.AUTOMATISCHER_ABGLEICH}/records/${id}`, { fields });
-  }
-  static async deleteAutomatischerAbgleichEntry(id: string) {
-    return callApi('DELETE', `/apps/${APP_IDS.AUTOMATISCHER_ABGLEICH}/records/${id}`);
-  }
-
   // --- ABGLEICH_STARTEN ---
   static async getAbgleichStarten(): Promise<AbgleichStarten[]> {
     const data = await callApi('GET', `/apps/${APP_IDS.ABGLEICH_STARTEN}/records`);
@@ -115,25 +115,25 @@ export class LivingAppsService {
     return callApi('DELETE', `/apps/${APP_IDS.ABGLEICH_STARTEN}/records/${id}`);
   }
 
-  // --- ABGLEICHSERGEBNIS ---
-  static async getAbgleichsergebnis(): Promise<Abgleichsergebnis[]> {
-    const data = await callApi('GET', `/apps/${APP_IDS.ABGLEICHSERGEBNIS}/records`);
+  // --- AUTOMATISCHER_ABGLEICH ---
+  static async getAutomatischerAbgleich(): Promise<AutomatischerAbgleich[]> {
+    const data = await callApi('GET', `/apps/${APP_IDS.AUTOMATISCHER_ABGLEICH}/records`);
     return Object.entries(data).map(([id, rec]: [string, any]) => ({
       record_id: id, ...rec
     }));
   }
-  static async getAbgleichsergebni(id: string): Promise<Abgleichsergebnis | undefined> {
-    const data = await callApi('GET', `/apps/${APP_IDS.ABGLEICHSERGEBNIS}/records/${id}`);
+  static async getAutomatischerAbgleichEntry(id: string): Promise<AutomatischerAbgleich | undefined> {
+    const data = await callApi('GET', `/apps/${APP_IDS.AUTOMATISCHER_ABGLEICH}/records/${id}`);
     return { record_id: data.id, ...data };
   }
-  static async createAbgleichsergebni(fields: Abgleichsergebnis['fields']) {
-    return callApi('POST', `/apps/${APP_IDS.ABGLEICHSERGEBNIS}/records`, { fields });
+  static async createAutomatischerAbgleichEntry(fields: AutomatischerAbgleich['fields']) {
+    return callApi('POST', `/apps/${APP_IDS.AUTOMATISCHER_ABGLEICH}/records`, { fields });
   }
-  static async updateAbgleichsergebni(id: string, fields: Partial<Abgleichsergebnis['fields']>) {
-    return callApi('PATCH', `/apps/${APP_IDS.ABGLEICHSERGEBNIS}/records/${id}`, { fields });
+  static async updateAutomatischerAbgleichEntry(id: string, fields: Partial<AutomatischerAbgleich['fields']>) {
+    return callApi('PATCH', `/apps/${APP_IDS.AUTOMATISCHER_ABGLEICH}/records/${id}`, { fields });
   }
-  static async deleteAbgleichsergebni(id: string) {
-    return callApi('DELETE', `/apps/${APP_IDS.ABGLEICHSERGEBNIS}/records/${id}`);
+  static async deleteAutomatischerAbgleichEntry(id: string) {
+    return callApi('DELETE', `/apps/${APP_IDS.AUTOMATISCHER_ABGLEICH}/records/${id}`);
   }
 
 }

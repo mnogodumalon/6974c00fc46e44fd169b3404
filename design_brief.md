@@ -1,206 +1,187 @@
-# Design Brief: Bestellabgleich-System Dashboard
+# Design Brief: Bestellabgleich-System
 
 ## 1. App Analysis
 
 ### What This App Does
-This is an **Order Comparison System (Bestellabgleich-System)** used in B2B procurement workflows. Users upload purchase orders (Bestellungen) and order confirmations (Auftragsbestätigungen), then the system automatically compares them to detect discrepancies in quantities, prices, delivery dates, or item details. This prevents costly errors from mismatched orders going unnoticed until goods arrive.
+This is an **Order Comparison System** (Bestellabgleich) that helps businesses verify that their orders match the order confirmations received from suppliers. Users upload order documents (Bestellungen) and order confirmations (Auftragsbestätigungen), the system uses OCR to extract data, and then automatically compares them to find discrepancies. It's a critical quality control tool for procurement departments.
 
 ### Who Uses This
-Procurement specialists, purchasing clerks, and operations managers in mid-sized companies who process multiple supplier orders daily. They need to quickly spot which comparisons failed and what specific differences exist. They're busy, not tech-savvy, and want to see problems at a glance without clicking through multiple screens.
+Procurement managers, purchasing assistants, and operations staff who need to verify that what they ordered matches what the supplier confirmed. They process many documents daily and need to quickly identify discrepancies before goods arrive.
 
 ### The ONE Thing Users Care About Most
-**How many comparisons have discrepancies right now?** They want to immediately see if everything is okay (all green) or if there are problems requiring attention (red alerts). The ratio of matched vs. mismatched comparisons is their primary concern.
+**"Are there any mismatches I need to deal with?"** - Users want to see at a glance how many comparisons have discrepancies that require their attention. The match rate and pending issues are their primary concern.
 
 ### Primary Actions (IMPORTANT!)
-1. **Neuen Abgleich starten** (Start new comparison) → Primary Action Button - users frequently need to initiate a comparison between an order and its confirmation
-2. View details of a specific discrepancy
-3. Mark comparison as reviewed/resolved
+1. **Neuen Abgleich starten** → Primary Action Button - Start a new comparison by selecting a Bestellung and Auftragsbestätigung
+2. View comparison details when discrepancies are found
+3. Mark comparisons as resolved (weiter)
 
 ---
 
 ## 2. What Makes This Design Distinctive
 
 ### Visual Identity
-A cool, precise aesthetic that reflects the analytical nature of procurement work. The design uses a slate-blue undertone throughout with a bold teal accent that signals "comparison" and "verification" - trust and accuracy without being cold. The typography is technical and precise (IBM Plex Sans) reflecting the data-driven nature of the work, while generous spacing keeps the dense information scannable.
+This design embraces a **precision-focused, technical aesthetic** that suits a document comparison tool. A cool slate-blue base with a sharp teal accent creates a professional atmosphere that signals accuracy and reliability. The design feels like a **quality control dashboard** - clean, no-nonsense, but with subtle sophistication in its typography and spacing that elevates it above generic admin panels.
 
 ### Layout Strategy
-The layout uses **asymmetric weighting** to create clear hierarchy:
-- **Hero section** dominates the top with a large status indicator showing the critical match rate
-- Two smaller supporting KPIs sit beside it (total comparisons, pending reviews)
-- Below, a full-width recent comparisons list shows the actual work items
-- The asymmetry comes from the hero being 2x the visual weight of supporting KPIs
-
-Visual interest is created through:
-- **Size variation**: Hero KPI is 48px vs 24px for secondary metrics
-- **Color coding**: Green/red/amber status indicators create immediate meaning
-- **Card depth variation**: Hero card has more elevation than list items
-- **Whitespace**: Hero section has extra breathing room below it
+- **Asymmetric layout on desktop**: Wide left column (70%) contains the hero metric and comparison list; narrow right column (30%) shows recent documents for quick reference
+- **Hero metric dominates**: The "Übereinstimmungsrate" (match rate) percentage takes center stage with large typography and a semi-circular gauge visualization
+- **Visual interest through contrast**: The hero uses a large radial gauge with thick strokes, while secondary KPIs use compact inline badges - creating clear hierarchy
+- **Status-driven color coding**: Green for matches, amber/orange for discrepancies, creating instant visual scanning
 
 ### Unique Element
-A **circular progress ring** around the match rate percentage that fills based on the success ratio. When 100% of comparisons match, the ring is completely green. As discrepancies increase, the ring shows a red segment. This gamification-inspired element makes the abstract match rate visceral and immediately understandable - like a health meter in a game.
+The **semi-circular gauge** for the match rate uses a thick 12px stroke with a gradient from teal to slate, giving it a premium instrument-panel feel. The percentage number sits inside the gauge with extreme size (64px) creating a bold focal point that anchors the entire dashboard.
 
 ---
 
 ## 3. Theme & Colors
 
 ### Font
-- **Family:** IBM Plex Sans
-- **URL:** `https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap`
-- **Why this font:** IBM Plex Sans conveys technical precision and trustworthiness - perfect for a data verification system. Its slightly condensed characters allow more data to fit while remaining highly readable.
+- **Family:** Space Grotesk
+- **URL:** `https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap`
+- **Why this font:** Space Grotesk has a technical, precision feel with its geometric forms and slightly condensed proportions. Perfect for a data comparison tool that needs to feel accurate and modern.
 
 ### Color Palette
 All colors as complete hsl() functions:
 
 | Purpose | Color | CSS Variable |
 |---------|-------|--------------|
-| Page background | `hsl(210 20% 98%)` | `--background` |
+| Page background | `hsl(210 25% 97%)` | `--background` |
 | Main text | `hsl(215 25% 17%)` | `--foreground` |
 | Card background | `hsl(0 0% 100%)` | `--card` |
 | Card text | `hsl(215 25% 17%)` | `--card-foreground` |
-| Borders | `hsl(214 20% 90%)` | `--border` |
+| Borders | `hsl(210 18% 88%)` | `--border` |
 | Primary action | `hsl(173 58% 39%)` | `--primary` |
 | Text on primary | `hsl(0 0% 100%)` | `--primary-foreground` |
-| Accent highlight | `hsl(173 40% 95%)` | `--accent` |
-| Muted background | `hsl(210 20% 96%)` | `--muted` |
+| Accent highlight | `hsl(173 58% 94%)` | `--accent` |
+| Muted background | `hsl(210 20% 94%)` | `--muted` |
 | Muted text | `hsl(215 16% 47%)` | `--muted-foreground` |
-| Success/positive | `hsl(158 64% 40%)` | (component use) |
+| Success/positive | `hsl(158 64% 42%)` | (component use) |
+| Warning/attention | `hsl(38 92% 50%)` | (component use) |
 | Error/negative | `hsl(0 72% 51%)` | `--destructive` |
 
 ### Why These Colors
-The cool slate-blue base creates a calm, professional environment that doesn't fatigue eyes during long work sessions. The teal primary is distinctive without being loud - it suggests verification and checking (like a checkmark color). The subtle warm cream undertone in the background prevents it from feeling sterile. Red and green are used sparingly only for status indicators where color meaning is universal.
+The cool slate-blue background creates a calm, focused environment suitable for detailed comparison work. The teal primary (`hsl(173 58% 39%)`) is distinctive but professional - it signals precision and reliability without being generic blue. The subtle warmth in the warning orange creates urgency for discrepancies without being alarming.
 
 ### Background Treatment
-The background is a subtle cool gray-blue (`hsl(210 20% 98%)`) - not pure white - creating depth when cards sit on top. No gradients or patterns; the simplicity keeps focus on the data.
+The page background uses a subtle cool gray (`hsl(210 25% 97%)`) that's slightly blue-tinted, creating a professional workspace feel. Cards sit on pure white, creating clear separation and depth without heavy shadows.
 
 ---
 
 ## 4. Mobile Layout (Phone)
 
-Design mobile as a COMPLETELY SEPARATE experience optimized for quick status checks on the go.
+Design mobile as a COMPLETELY SEPARATE experience, not squeezed desktop.
 
 ### Layout Approach
-Mobile uses a stacked vertical flow with the hero status ring taking prominent center position. The design assumes mobile users are checking "is everything okay?" rather than doing deep analysis. Size variation creates hierarchy: the hero ring is large and centered, while KPIs use a compact horizontal arrangement.
+Mobile prioritizes the hero metric and action button. The match rate gauge dominates the top fold, with status cards using horizontal scroll for space efficiency. The list of comparisons uses a compact card format optimized for thumb scrolling.
 
 ### What Users See (Top to Bottom)
 
 **Header:**
-- App title "Bestellabgleich" left-aligned, 20px semibold
-- Primary action button "Neuer Abgleich" as icon button (+ icon) in top right, 44px touch target
+Simple header with app title "Bestellabgleich" left-aligned. No navigation clutter.
 
 **Hero Section (The FIRST thing users see):**
-- Large circular progress ring, 180px diameter, centered
-- Inside the ring: Match rate percentage in 48px bold (e.g., "87%")
-- Below the number: "Übereinstimmung" label in 14px muted text
-- Ring stroke is 10px with rounded caps
-- Green fill for matched portion, red for mismatched
-- Takes approximately 45% of initial viewport height
-- **Why this is hero:** Users opening on mobile want instant status - "are there problems?" This ring gives that answer in under 1 second.
+- **What:** Match rate percentage with semi-circular gauge
+- **Size:** Takes approximately 45% of viewport height
+- **Styling:**
+  - Large 56px number centered in gauge
+  - "Übereinstimmungsrate" label below (14px, muted)
+  - Gauge uses 10px stroke, gradient from primary to muted
+  - Card with generous padding (24px)
+- **Why:** Users need to know instantly if there are problems to address
 
-**Section 2: Quick Stats Row**
-- Horizontal row of 3 compact stats, not cards - just inline numbers
-- "23 Abgleiche" | "3 Abweichungen" | "5 Offen"
-- Each stat: 24px number above 12px label, separated by thin vertical dividers
-- This row is dense and scannable, contrasting with the spacious hero above
+**Section 2: Status Summary**
+- Horizontal scrolling row of 3 compact status badges
+- "Gesamt Abgleiche" (total), "Übereinstimmend" (matching), "Mit Abweichungen" (with discrepancies)
+- Each badge: icon + number + label, pill-shaped, background colored by status
+- Fits without scrolling on most phones, but scrolls gracefully if needed
 
-**Section 3: Aktuelle Abgleiche (Recent Comparisons)**
-- Section header "Aktuelle Abgleiche" 16px semibold
-- List of comparison cards, each card showing:
-  - Status indicator dot (green/red) on left edge, 12px
-  - Order number and confirmation number on two lines
-  - Supplier name in muted text
-  - Date on right side
-  - Chevron indicating tap-to-expand
-- Cards have minimal padding (12px) and 4px gap between them
-- Show last 5 comparisons, then "Alle anzeigen" link
+**Section 3: Letzte Abgleiche (Recent Comparisons)**
+- Section title "Letzte Abgleiche" with small "Alle anzeigen" link
+- Stack of comparison cards (max 5 visible)
+- Each card shows:
+  - Status indicator (green dot or orange dot)
+  - Bestellnummer and Lieferant
+  - Date (compact format: "15. Jan")
+  - Chevron for drill-down
 
 **Bottom Navigation / Action:**
-- Floating action button (FAB) in bottom-right corner
-- Teal primary color, 56px diameter
-- Plus icon inside
-- 16px margin from edges
-- This duplicates the header action for thumb-friendly access
+- Fixed bottom bar with primary action button
+- "Neuen Abgleich starten" - full width, teal background, white text
+- 16px margin from edges, safe area aware
 
 ### Mobile-Specific Adaptations
-- Hero ring is centered and larger relative to screen than on desktop
-- Stats row is horizontal scroll if needed, but 3 stats should fit
-- Comparison cards are full-width with reduced padding
-- No hover states - tap feedback via subtle scale animation
+- Gauge is smaller but still prominent (200px diameter vs 280px desktop)
+- Status badges use horizontal scroll instead of grid
+- Comparison list cards are more compact (less padding, single-line info)
+- No right sidebar - documents list is accessible via separate tab/view
 
 ### Touch Targets
-- All tappable elements minimum 44px
-- FAB is 56px for easy thumb reach
-- Card rows have full-width tap area
+- All tappable elements minimum 44px height
+- Comparison cards have full-width tap area
+- Primary button is 52px tall for comfortable thumb tap
 
 ### Interactive Elements
-- Tapping a comparison card expands it inline to show discrepancy details (if any)
-- Collapsible accordion pattern - only one expanded at a time
+- Comparison cards tap to show full detail view with:
+  - Both document numbers
+  - Full discrepancy list (if any)
+  - Option to mark as "weiter" (proceed)
 
 ---
 
 ## 5. Desktop Layout
 
 ### Overall Structure
-Two-column layout with 65/35 split:
-- **Left column (65%):** Hero metrics section + comparison list
-- **Right column (35%):** Quick filters and summary sidebar
+Two-column asymmetric layout:
+- **Left column (70%):** Hero metric + comparison list
+- **Right column (30%):** Recent documents sidebar
 
-The eye flows: Hero ring (top-left) → Supporting KPIs (below hero) → Comparison list (scrollable main content) → Filters (right sidebar for power users)
-
-Visual interest comes from the asymmetric column split and the hero ring's size dominance.
+Eye flow: Hero gauge (top-left, largest) → Status KPIs (below hero) → Comparison list (main content) → Documents sidebar (reference)
 
 ### Section Layout
 
-**Top Area (Left Column):**
-- Hero card spans full left column width
-- Contains: Large progress ring (200px) on left, text stats on right
-- Ring shows match percentage with green/red segments
-- Right of ring:
-  - "87%" large number (56px)
-  - "Übereinstimmung" label
-  - "23 von 26 Abgleichen erfolgreich" subtext
-- Card has subtle shadow (0 2px 8px rgba(0,0,0,0.06))
+**Top Left Area - Hero (spans 60% width, first row):**
+- Match rate gauge (280px diameter)
+- Large percentage in center
+- "Übereinstimmungsrate" label
+- Contained in elevated card
 
-**Below Hero (Left Column):**
-- Row of 3 metric cards, equal width
-- "Gesamt-Abgleiche" (total comparisons) - count + trend
-- "Abweichungen" (discrepancies) - count, red accent if > 0
-- "Ausstehend" (pending review) - count, amber if > 0
-- Each card: Number large (32px), label below (14px muted)
+**Top Right Area - Quick Stats (spans 40% width, first row):**
+- 3 KPI cards in vertical stack within the row
+- Total comparisons
+- Matching count
+- Discrepancies count (highlighted if > 0)
 
-**Main Content (Left Column):**
-- "Aktuelle Abgleiche" section header with sort dropdown
-- Table-style list showing:
-  - Status column (dot indicator)
-  - Bestellnummer (order number)
-  - AB-Nummer (confirmation number)
-  - Lieferant (supplier)
-  - Datum (date)
-  - Abweichungen (discrepancy count or "Keine")
-- Alternating row backgrounds for scanability
-- Pagination at bottom
+**Main Content Area - Left Column:**
+- "Letzte Abgleiche" section heading with filter dropdown
+- Table view of comparisons:
+  - Status (icon)
+  - Bestellnummer
+  - AB-Nummer (order confirmation)
+  - Lieferant
+  - Datum
+  - Abweichungen (count)
+- Sortable columns
+- Pagination if > 10 items
 
-**Right Sidebar (35%):**
-- Sticky position, doesn't scroll with main content
-- "Filter" section:
-  - Status filter (Alle / Übereinstimmend / Abweichend)
-  - Date range picker
-  - Supplier dropdown
-- "Neuer Abgleich" primary button, full sidebar width
-- Below button: Quick stats summary
-  - Documents this week
-  - Avg. processing time
+**Right Sidebar:**
+- "Dokumente" section
+- Two tabs: "Bestellungen" / "Bestätigungen"
+- List of recent documents (5 each)
+- Shows: Nummer, Lieferant, OCR status icon
+- Quick access without leaving dashboard
 
 ### What Appears on Hover
-- Table rows highlight with subtle background tint
-- Comparison rows show "Details anzeigen" link on right
-- Metric cards show subtle elevation increase
+- Table rows highlight with subtle background change
+- Status badges show tooltip with full status text
+- Document items in sidebar show "Abgleich starten" quick action
 
 ### Clickable/Interactive Areas
-- Clicking any comparison row opens a detail modal showing:
-  - Full comparison data
-  - Side-by-side order vs confirmation fields
-  - Highlighted discrepancies in red
-  - "Als geprüft markieren" action button
+- Table rows click to expand inline detail view showing:
+  - Full comparison results
+  - Discrepancy details in table format
+  - Action buttons
+- Sidebar documents click to start new comparison with that document pre-selected
 
 ---
 
@@ -209,81 +190,95 @@ Visual interest comes from the asymmetric column split and the hero ring's size 
 ### Hero KPI
 The MOST important metric that users see first.
 
-- **Title:** Übereinstimmungsrate (Match Rate)
-- **Data source:** Abgleichsergebnis app
-- **Calculation:** Count records where `abgleich_status === true` divided by total records, multiply by 100
-- **Display:** Large percentage number (56px desktop, 48px mobile) inside a circular progress ring
-- **Context shown:** Ring visualization shows proportion, subtext shows "X von Y Abgleichen erfolgreich"
-- **Why this is the hero:** The match rate is the single number that tells users if the system is healthy or needs attention. Everything else is supporting detail.
+- **Title:** Übereinstimmungsrate
+- **Data source:** AutomatischerAbgleich app
+- **Calculation:** (count where abgleich_status = true) / (total count) × 100
+- **Display:** Semi-circular gauge with percentage in center
+  - Gauge: 280px desktop, 200px mobile
+  - Stroke: 12px desktop, 10px mobile
+  - Number: 64px desktop, 56px mobile, font-weight 700
+  - Color: gradient from primary (full) to muted (empty)
+- **Context shown:** "von X Abgleichen" subtitle showing total
+- **Why this is the hero:** Instantly answers "how well are things going?" - the core user need
 
 ### Secondary KPIs
 
-**Gesamt-Abgleiche (Total Comparisons)**
-- Source: Abgleichsergebnis (count all records)
-- Calculation: Simple count
+**Gesamt Abgleiche (Total Comparisons)**
+- Source: AutomatischerAbgleich
+- Calculation: count of all records
 - Format: number
-- Display: Card with large number
+- Display: Compact card with icon, uses muted styling
 
-**Abweichungen (Discrepancies)**
-- Source: Abgleichsergebnis where `abgleich_status === false`
-- Calculation: Count of failed comparisons
-- Format: number with red accent if > 0
-- Display: Card with large number, destructive color when > 0
+**Übereinstimmend (Matching)**
+- Source: AutomatischerAbgleich
+- Calculation: count where abgleich_status = true
+- Format: number with percentage
+- Display: Card with success color accent (green)
 
-**Ausstehende Prüfungen (Pending Reviews)**
-- Source: Abgleichsergebnis where `abgleich_weiter === false` or null
-- Calculation: Count of items not yet marked as reviewed
-- Format: number with amber accent if > 0
-- Display: Card with large number
+**Mit Abweichungen (With Discrepancies)**
+- Source: AutomatischerAbgleich
+- Calculation: count where abgleich_status = false
+- Format: number
+- Display: Card with warning color accent (orange) - draws attention if > 0
 
 ### Chart (if applicable)
-- **Type:** None for initial version - the circular progress ring serves as the primary visualization
-- The data is more suited to lists than time-series charts since comparisons are discrete events
+No chart needed for this dashboard. The gauge visualization serves as the primary data visualization. The comparison list provides the detailed breakdown.
 
 ### Lists/Tables
 
-**Aktuelle Abgleiche (Recent Comparisons)**
-- Purpose: Show the actual work items users need to review
-- Source: Abgleichsergebnis joined with AbgleichStarten → Bestellung and Auftragsbestaetigung
+**Letzte Abgleiche (Recent Comparisons)**
+- Purpose: Show recent comparison results for review and action
+- Source: AutomatischerAbgleich (joined with Bestellung and Auftragsbestaetigung via applookup)
 - Fields shown:
-  - Status indicator (from abgleich_status)
+  - Status indicator (boolean → icon/color)
   - Bestellnummer (from linked Bestellung)
   - AB-Nummer (from linked Auftragsbestaetigung)
-  - Lieferant (from linked Bestellung)
-  - Datum (createdat from Abgleichsergebnis)
-  - Abweichungen count or "Keine"
-- Mobile style: Compact cards with status dot, stacked text
-- Desktop style: Table rows with columns
-- Sort: By date descending (newest first)
+  - Lieferant
+  - Datum (createdat)
+  - Abweichungen (parsed from abgleich_abweichungen, show count or "Keine")
+- Mobile style: Stacked cards with status dot, main info, and chevron
+- Desktop style: Table with sortable columns
+- Sort: By createdat descending (newest first)
 - Limit: 10 items with pagination
+
+**Documents Sidebar (Desktop only)**
+- Purpose: Quick access to source documents
+- Source: Bestellung and Auftragsbestaetigung
+- Fields shown: Nummer, Lieferant, OCR status
+- Style: Simple list with icon indicators
+- Sort: By createdat descending
+- Limit: 5 per type
 
 ### Primary Action Button (REQUIRED!)
 
-- **Label:** "Neuer Abgleich" (mobile: plus icon only in FAB)
-- **Action:** navigate to comparison selection
-- **Target app:** Opens a modal/dialog to select Bestellung and Auftragsbestaetigung to compare
-- **What data:** User selects from dropdown: 1) Bestellung, 2) Auftragsbestaetigung - then submits to create AbgleichStarten record
-- **Mobile position:** FAB (bottom-right floating action button) + small icon button in header
-- **Desktop position:** Sidebar, full-width button at top of right column
-- **Why this action:** Starting a new comparison is the most frequent action - users receive new confirmations constantly and need to verify them against orders
+- **Label:** "Neuen Abgleich starten"
+- **Action:** add_record
+- **Target app:** AbgleichStarten (which triggers the automatic comparison)
+- **What data:** Form with two select fields:
+  - abgleich_bestellung (select from Bestellung records)
+  - abgleich_ab (select from Auftragsbestaetigung records)
+- **Mobile position:** bottom_fixed (full width bar)
+- **Desktop position:** header (top right of main content area)
+- **Why this action:** Starting new comparisons is the core workflow - users need to verify orders constantly
 
 ---
 
 ## 7. Visual Details
 
 ### Border Radius
-Rounded (8px) - professional but not sharp, not overly soft
+Rounded (8px) - professional but not too soft. Cards use 12px for slight extra softness.
 
 ### Shadows
-Subtle - cards use `0 2px 8px rgba(0,0,0,0.06)`, hero card slightly more `0 4px 12px rgba(0,0,0,0.08)`
+Subtle - cards use `0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)` for gentle lift without feeling heavy.
 
 ### Spacing
-Spacious - 24px gap between major sections, 16px within cards, 8px between list items
+Normal to spacious - generous padding inside cards (20px mobile, 24px desktop), 16px gaps between elements. The dashboard should feel organized and breathable, not cramped.
 
 ### Animations
-- **Page load:** Subtle fade-in (200ms), progress ring animates from 0 to actual value (600ms ease-out)
-- **Hover effects:** Cards lift slightly with increased shadow
-- **Tap feedback:** Brief scale to 0.98 on mobile touch
+- **Page load:** Stagger fade-in for cards (50ms delay between each)
+- **Hover effects:** Subtle background color shift on interactive rows
+- **Tap feedback:** Scale down slightly (0.98) on button press
+- **Gauge:** Animate from 0 to actual value on load (600ms ease-out)
 
 ---
 
@@ -293,7 +288,7 @@ The implementer MUST copy these values exactly into `src/index.css`:
 
 ```css
 :root {
-  --background: hsl(210 20% 98%);
+  --background: hsl(210 25% 97%);
   --foreground: hsl(215 25% 17%);
   --card: hsl(0 0% 100%);
   --card-foreground: hsl(215 25% 17%);
@@ -301,21 +296,21 @@ The implementer MUST copy these values exactly into `src/index.css`:
   --popover-foreground: hsl(215 25% 17%);
   --primary: hsl(173 58% 39%);
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(210 20% 96%);
+  --secondary: hsl(210 20% 94%);
   --secondary-foreground: hsl(215 25% 17%);
-  --muted: hsl(210 20% 96%);
+  --muted: hsl(210 20% 94%);
   --muted-foreground: hsl(215 16% 47%);
-  --accent: hsl(173 40% 95%);
-  --accent-foreground: hsl(215 25% 17%);
+  --accent: hsl(173 58% 94%);
+  --accent-foreground: hsl(173 58% 25%);
   --destructive: hsl(0 72% 51%);
-  --border: hsl(214 20% 90%);
-  --input: hsl(214 20% 90%);
+  --border: hsl(210 18% 88%);
+  --input: hsl(210 18% 88%);
   --ring: hsl(173 58% 39%);
-  --chart-1: hsl(158 64% 40%);
-  --chart-2: hsl(0 72% 51%);
-  --chart-3: hsl(45 93% 47%);
-  --chart-4: hsl(173 58% 39%);
-  --chart-5: hsl(215 16% 47%);
+  --chart-1: hsl(173 58% 39%);
+  --chart-2: hsl(158 64% 42%);
+  --chart-3: hsl(38 92% 50%);
+  --chart-4: hsl(215 25% 17%);
+  --chart-5: hsl(210 20% 94%);
   --radius: 0.5rem;
 }
 ```
@@ -325,15 +320,13 @@ The implementer MUST copy these values exactly into `src/index.css`:
 ## 9. Implementation Checklist
 
 The implementer should verify:
-- [ ] IBM Plex Sans font loaded from Google Fonts URL
-- [ ] All CSS variables copied exactly as specified
-- [ ] Mobile layout matches Section 4 (FAB, centered hero ring, compact stats row)
-- [ ] Desktop layout matches Section 5 (65/35 split, hero with ring left-aligned)
-- [ ] Hero progress ring animates on load
-- [ ] Hero shows actual match rate from API data
-- [ ] Secondary KPIs show correct counts with color coding
-- [ ] Comparison list shows linked data (order number, confirmation number, supplier)
-- [ ] FAB appears on mobile only
-- [ ] Sidebar with filters appears on desktop only
-- [ ] "Neuer Abgleich" button opens selection dialog
-- [ ] Color coding: green for matched, red for discrepancies, amber for pending
+- [ ] Font loaded from Google Fonts URL above (Space Grotesk)
+- [ ] All CSS variables copied exactly
+- [ ] Mobile layout matches Section 4 (hero gauge, horizontal status badges, stacked cards, fixed bottom button)
+- [ ] Desktop layout matches Section 5 (two-column asymmetric, hero left, sidebar right)
+- [ ] Hero element is prominent as described (large gauge with percentage)
+- [ ] Colors create the mood described in Section 2 (professional, precision-focused)
+- [ ] Primary action button present and functional
+- [ ] Status colors applied correctly (green for match, orange for discrepancy)
+- [ ] Gauge animates on load
+- [ ] Table/list shows linked data from Bestellung and Auftragsbestaetigung

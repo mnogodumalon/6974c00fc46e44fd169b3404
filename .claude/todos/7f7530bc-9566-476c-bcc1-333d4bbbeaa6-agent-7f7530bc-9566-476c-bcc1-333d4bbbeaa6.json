@@ -1,0 +1,22 @@
+[
+  {
+    "content": "Create design_brief.md for Bestellabgleich-System dashboard",
+    "status": "completed",
+    "activeForm": "Creating design brief for Bestellabgleich-System dashboard"
+  },
+  {
+    "content": "Implement Dashboard.tsx following design_brief.md exactly",
+    "status": "completed",
+    "activeForm": "Implementing Dashboard.tsx"
+  },
+  {
+    "content": "Update src/index.css with design colors",
+    "status": "completed",
+    "activeForm": "Updating CSS variables with design colors"
+  },
+  {
+    "content": "Build and deploy using mcp__deploy_tools__deploy_to_github",
+    "status": "in_progress",
+    "activeForm": "Building and deploying to GitHub"
+  }
+]
